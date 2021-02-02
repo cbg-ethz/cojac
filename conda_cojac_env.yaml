@@ -1,0 +1,11 @@
+name: cojac
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - pysam
+  - python 
+  - pandas
+  - numpy
+  - pyyaml

@@ -16,11 +16,11 @@ import pysam
 argparser = argparse.ArgumentParser(description="scan amplicon (covered by long read pairs) for mutation cooccurrence")
 inputgroup = argparser.add_mutually_exclusive_group(required=True)
 inputgroup.add_argument('-s', '--samples', metavar='TSV',
-	type=str, dest='samples', help="samples list tsv")
+	type=str, dest='samples', help="V-pipe samples list tsv")
 inputgroup.add_argument('-a', '--alignments', metavar='BAM/CRAM', nargs='+',
 	dest='alignments', help="alignment files")
 argparser.add_argument('-p', '--prefix', metavar='PATH', required=False, default="working/samples",
-	type=str, dest='prefix', help="prefix for where to look at align files when using TSV samples list")
+	type=str, dest='prefix', help="V-pipe work directory prefix for where to look at align files when using TSV samples list")
 argparser.add_argument('-j', '--json', metavar='JSON', required=False, default=None,
 	type=str, dest='json', help="output results to as JSON file")
 argparser.add_argument('-y', '--yaml', metavar='YAML', required=False, default=None,
@@ -127,8 +127,8 @@ def scanamplicon(read_iter, mut_dict):
 # TODO better naming
 def findbam(prefix, batch, sample):
 	'''function to find bam from prefix, batch and sample'''
-	alnfname=f"{prefix}/{sample}/{batch}/alignments/REF_aln.bam"
-	#TODO: assertion?
+	alnfname=os.path.join(prefix,sample,batch,'alignments/REF_aln.bam')
+	assert os.path.isfile(alnfname), f"cannot find alginment file {alnfname}"
 	return alnfname
 
 
@@ -165,10 +165,9 @@ rq_chr='NC_045512.2'
 
 
 # loop for if samples are given through the TSV list
+table={}
 if args.samples is not None:
 	i=0
-	table={}
-	# TODO real jobs instead of a loop
 	with open(args.samples,'rt',encoding='utf-8', newline='') as tf:	# this file has the same content as the original experiment
 		for r in csv.reader(tf, delimiter='\t'): #dialect='excel-tab'):
 			sample,batch=r[:2]
@@ -180,11 +179,10 @@ if args.samples is not None:
 			table[sample]=scanbam(alnfname, amplicons)
 
 # loop for if samples are given through -a option
+# this option can also de used to dispatch per sample jobx on the cluster
 else:
-	i=0
-	table={}
 	for alnfname in args.alignments:
-		sample = alnfname # Is that right?
+		sample = alnfname # HACK use the whole BAM file as sample name
 		table[sample]=scanbam(alnfname, amplicons)
 
 
