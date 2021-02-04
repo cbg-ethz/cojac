@@ -113,7 +113,7 @@ The default `-d` / `--dump` option of `cooc-mutbamscan` is not a very user-frien
 cooc-colourmut -j cooc-test.json
 ```
 
-<img src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0, 0, 1436.63, 117.45" font-family="SauceCodePro Nerd Font, Source Code Pro, Courier" font-size="14"><g fill="%23e0e0e0"><rect x="0" y="0" width="1436.63" height="117.45" fill="%232c3e50"/><text x="84.01" y="14.55">72_UK                      78_UK                      92_UK                      93_UK                      76_SA                      77_EU</text><text x="84.01" y="33.55">21765-21770&%23x394;,21991-21993&%23x394;  23604A,23709T              27972T,28048T,28111G       28111G,28280-28280-&%23x3E;CTA    23012A,23063T              23403G</text><text x="0" y="52.55">sample:       cov:     mut:   frq/%:     cov:     mut:   frq/%:     cov:     mut:   frq/%:     cov:     mut:   frq/%:     cov:     mut:   frq/%:     cov:     mut:   frq/%:</text><text x="0" y="71.55">sam1.bam       809</text><text x="201.63" y="71.55" font-weight="bold" fill="%232ecc71">158  19.53%2</text><text x="352.86" y="71.55">452</text><text x="445.27" y="71.55" font-weight="bold" fill="%232ecc71">2   0.44%2</text><text x="579.69" y="71.55">400</text><text x="663.71" y="71.55" font-weight="bold" fill="%232ecc71">89  22.25%3</text><text x="806.53" y="71.55">758</text><text x="882.14" y="71.55" font-weight="bold" fill="%232ecc71">344  45.38%2</text><text x="1024.97" y="71.55">1090</text><text x="1108.98" y="71.55" font-weight="bold" fill="%23e9bd0e">377    (1/2)</text><text x="1260.21" y="71.55">371</text><text x="1335.82" y="71.55" font-weight="bold" fill="%232ecc71">371 100.00%1</text><text x="0" y="90.55">sam2.bam      1121</text><text x="201.63" y="90.55" font-weight="bold" fill="%23ce4435">N/A      N/A</text><text x="352.86" y="90.55">255</text><text x="436.87" y="90.55" font-weight="bold" fill="%23e9bd0e">52    (1/2)</text><text x="579.69" y="90.55">432</text><text x="663.71" y="90.55" font-weight="bold" fill="%232ecc71">58  13.43%3</text><text x="806.53" y="90.55">958</text><text x="882.14" y="90.55" font-weight="bold" fill="%232ecc71">142  14.82%2</text><text x="1024.97" y="90.55">1005</text><text x="1108.98" y="90.55" font-weight="bold" fill="%23ce4435">N/A      N/A</text><text x="1251.8" y="90.55">1615</text><text x="1327.42" y="90.55" font-weight="bold" fill="%232ecc71">1615 100.00%1</text></g></svg>' alt="[terminal screen shot]" />
+![terminal screen shot](images/terminal.svg)
 
 ### Render table for publication
 
@@ -199,8 +199,9 @@ Long term goal:
 
  - [Niko Beerenwinkel ![orcid]](https://orcid.org/0000-0002-0573-6119)
 
-[github]: https://cbg-ethz.github.io/V-pipe/img/mark-github.svg
-[orcid]: https://orcid.org/sites/default/files/images/orcid_16x16.png
+[github]: images/mark-github.svg
+[orcid]: images/ORCIDiD_iconvector.svg
+
 
 ## Citation
 
