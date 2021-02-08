@@ -171,7 +171,32 @@ We recommend using conda to install them:
 ```bash
 conda env create -f conda_cojac_env.yaml
 conda activate cojac
+# now run from the cojac directory
+./cooc-mutbamscan --help
 ```
+
+_cojac_ itself doesn't have a specific installer but you can copy its executables in your _PATH_ (so you can call them without specifying their location), e.g.: into the conda environment:
+
+```bash
+# activate the environment if not already active:
+conda activate cojac
+cp cooc-* ${CONDA_PREFIX}/bin/
+cooc-mutbamscan --help
+```
+
+### Remove conda environment
+
+You can remove the conda environment if you don't need it any more:
+
+```bash
+# exit the cojac environment first:
+conda deactivate
+conda env remove -n cojac
+```
+
+## Additional notebooks
+
+The subdirectory [`notebooks/`](notebooks/) contains Jupyter and Rstudio notebooks used in the [publication](#citation).
 
 ## Upcoming features
 
@@ -193,6 +218,7 @@ Long term goal:
 
 #### Additional notebooks:
 
+ - [Lara Fuhrmann ![orcid]](https://orcid.org/0000-0001-6405-0654), [![github]](https://github.com/LaraFuhrmann)
  - [Katharina Jahn ![orcid]](https://orcid.org/0000-0002-6983-4615), [![github]](https://github.com/jahnka)
 
 #### Corresponding author:
