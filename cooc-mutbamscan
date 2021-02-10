@@ -13,7 +13,9 @@ import pysam
 
 
 # parse command line
-argparser = argparse.ArgumentParser(description="scan amplicon (covered by long read pairs) for mutation cooccurrence")
+argparser = argparse.ArgumentParser(fromfile_prefix_chars='@', # support pass BAM list in file instead of parameters
+	description="scan amplicon (covered by long read pairs) for mutation cooccurrence",
+	epilog="@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line")
 inputgroup = argparser.add_mutually_exclusive_group(required=True)
 inputgroup.add_argument('-s', '--samples', metavar='TSV',
 	type=str, dest='samples', help="V-pipe samples list tsv")
@@ -21,6 +23,8 @@ inputgroup.add_argument('-a', '--alignments', metavar='BAM/CRAM', nargs='+',
 	dest='alignments', help="alignment files")
 argparser.add_argument('-p', '--prefix', metavar='PATH', required=False, default="working/samples",
 	type=str, dest='prefix', help="V-pipe work directory prefix for where to look at align files when using TSV samples list")
+argparser.add_argument('-r', '--reference', metavar='REFID', required=False, default='NC_045512.2',
+	type=str, dest='rq_chr', help="reference to look for in alignment files")
 argparser.add_argument('-j', '--json', metavar='JSON', required=False, default=None,
 	type=str, dest='json', help="output results to as JSON file")
 argparser.add_argument('-y', '--yaml', metavar='YAML', required=False, default=None,
@@ -161,7 +165,8 @@ amplicons={
 # '76_UK': [22879, 23142, {23063: 'T',23271: 'A'}],
  '77_EU': [23194, 23464, {23403: 'G'}],
 }
-rq_chr='NC_045512.2'
+# TODO autoguess reference from alignment
+rq_chr=args.rq_chr # e.g.: 'NC_045512.2'
 
 
 # loop for if samples are given through the TSV list
