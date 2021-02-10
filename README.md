@@ -1,6 +1,8 @@
 
 # COJAC - CoOccurrence adJusted Analysis and Calling
 
+[![Bioconda package](https://img.shields.io/conda/dn/bioconda/cojac.svg?label=Bioconda)](https://bioconda.github.io/recipes/cojac/README.html)
+[![Docker container](https://quay.io/repository/biocontainers/cojac/status)](https://quay.io/repository/biocontainers/cojac)
 
 ## Description
 
@@ -146,10 +148,12 @@ pandoc cooc-output.csv -o cooc-output.md
 
 ## Installation
 
-We recommend using bioconda software repositories for easy installation.
+We recommend using [bioconda software repositories](https://bioconda.github.io/index.html) for easy installation.
 You can find instruction to setup your bioconda environment at the following address:
 
  - https://bioconda.github.io/user/install.html
+
+In those instructions, please follow carefully the [section _2. Set up channels_](https://bioconda.github.io/user/install.html#set-up-channels).
 
 If you use [V-pipe’s `quick_install.sh`](https://cbg-ethz.github.io/V-pipe/tutorial/sars-cov2/#install-v-pipe), it will set up an environment that you can activate, e.g.:
 
@@ -160,7 +164,31 @@ bash quick_install.sh -b sars-cov2 -p testing -w work
 
 ### Prebuilt package
 
-A prebuilt package will be available shortly in the bioconda repository. Come back in the following days for an update.
+
+_cojac_ and its dependencies are all available in the bioconda repository. We strongly advise you to install [this pre-built package](https://bioconda.github.io/recipes/cojac/README.html) for a hassle-free experience.
+
+You can install _cojac_ in its own environment and activate it:
+
+```bash
+conda create -n cojac cojac
+conda activate cojac
+# test it
+cooc-mutbamscan --help
+```
+
+And to update it to the latest version, run:
+
+```bash
+# activate the environment if not already active:
+conda activate cojac
+conda update cojac
+```
+
+Or you can add it to the current environment (e.g.: in environment _base_):
+
+```bash
+conda install cojac
+```
 
 ### Dependencies
 
@@ -200,7 +228,7 @@ The subdirectory [`notebooks/`](notebooks/) contains Jupyter and Rstudio noteboo
 
 ## Upcoming features
 
-- [ ] bioconda package
+- [x] ~~bioconda package~~
 - [ ] further jupyter and rstudio code from the publication
 - [ ] Move hard-coded amplicons to BED input file
 - [ ] Move hard-coded mutations to YAML configuration
