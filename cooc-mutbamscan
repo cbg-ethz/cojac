@@ -161,7 +161,7 @@ def scanbam(alnfname, amplicons):
 def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 	"""function to make a dictionnary of places to look for coocurences of mutations.
 	Input:
-		amp_bed: pd.DataFrame with columns "start" and "stop" of the start and stop positions of the amplicons.
+		amp_bed: pd.DataFrame with columns "qstart" and "qstop" of the query start and stop positions of the amplicons.
 		mut_df: dict with keys "position" and value "mutation" for each mutation to look for
 		voc_name: name given to the variant of concern
 	Returns:
@@ -172,14 +172,14 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 	mut_df = pd.DataFrame({"position" : mut_dict.keys(), "mutation" : mut_dict.values()})
 	amplicons_dict = {}
 	for i in range(amp_bed.shape[0]):
-		start, end = amp_bed.iloc[i]["start"], amp_bed.iloc[i]["stop"]
+		start, end, qstart, qstop = amp_bed.iloc[i].loc[["start", "stop", "qstart", "qstop"]]
 		t_df = mut_df[(start <= mut_df["position"]) & (mut_df["position"] <= end)]
 		tmp_mut_dict = dict()
 		for j in range(t_df.shape[0]):
 			tmp_mut_dict[t_df.iloc[j]["position"]] = t_df.iloc[j]["mutation"]
 
 		if len(tmp_mut_dict) > 1:
-			amplicons_dict["{}_{}".format(i+1, voc_name)] = [start, end, tmp_mut_dict]
+			amplicons_dict["{}_{}".format(i+1, voc_name)] = [qstart, qstop, tmp_mut_dict]
 
 	return amplicons_dict
 
@@ -198,6 +198,9 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 # load bedfile
 bedfile = args.bedfile
 amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
+# make query start and query end for each amplicon
+amp_bed["qstart"] = pd.concat([amp_bed["start"][0:1], amp_bed["stop"][:-1]]).reset_index(drop=True) + 30
+amp_bed["qstop"] = pd.concat([amp_bed["start"][1:], amp_bed["stop"][-1:]]).reset_index(drop=True) - 30
 
 # load all voc yamls
 vocdir = args.vocdir
@@ -211,7 +214,7 @@ for path in os.listdir(vocdir):
 # make amplicon dict for each voc
 all_amp_dict = []
 for yam in loaded_yamls:
-    all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["voc"]["short"]))
+	all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["voc"]["short"]))
 # merge dicts
 amplicons = {k: v for dic in all_amp_dict for k, v in dic.items()}
 print(amplicons)
