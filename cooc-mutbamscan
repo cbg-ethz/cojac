@@ -85,7 +85,6 @@ def test_read(read, mut_dict):
 		return (found_site, found_mut)
 	else: # sites present, but no mutation found
 		return (found_site, None)
-
 # scan an amplicon for a specific set of mutations
 def scanamplicon(read_iter, mut_dict):
 	# TODO inefficient, could be streamed (with an accumulator for pairs)
@@ -205,7 +204,7 @@ amp_bed["qstop"] = pd.concat([amp_bed["start"][1:], amp_bed["stop"][-1:]]).reset
 # load all voc yamls
 vocdir = args.vocdir
 loaded_yamls = []
-for path in os.listdir(vocdir):
+for path in [p for p in os.listdir(vocdir) if not p.startswith('.')]:
 	full_path = os.path.join(vocdir, path)
 	with open(full_path, 'r') as file:
 		loaded_yaml = yaml.load(file, Loader=yaml.FullLoader)
