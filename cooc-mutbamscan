@@ -154,17 +154,65 @@ def scanbam(alnfname, amplicons):
 	return amp_results
 
 
+def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
+	"""function to make a dictionnary of places to look for coocurences of mutations.
+	Input:
+		amp_bed: pd.DataFrame with columns "start" and "stop" of the start and stop positions of the amplicons.
+		mut_df: dict with keys "position" and value "mutation" for each mutation to look for
+		voc_name: name given to the variant of concern
+	Returns:
+		amplicons_dict: dict() with entries of the form: 
+			*amplicon_number*_*voc_name* : [start, stop, {position1 : mutation1, position2 : mutation2 , ...}] 
+			for each amplicon where cooccurences could be found
+	"""
+	mut_df = pd.DataFrame({"position" : mut_dict.keys(), "mutation" : mut_dict.values()})
+	amplicons_dict = {}
+	for i in range(amp_bed.shape[0]):
+		start, end = amp_bed.iloc[i]["start"], amp_bed.iloc[i]["stop"]
+		t_df = mut_df[(start <= mut_df["position"]) & (mut_df["position"] <= end)]
+		tmp_mut_dict = dict()
+		for j in range(t_df.shape[0]):
+			tmp_mut_dict[t_df.iloc[j]["position"]] = t_df.iloc[j]["mutation"]
+
+		if len(tmp_mut_dict) > 1:
+			amplicons_dict["{}_{}".format(i+1, voc_name)] = [start, end, tmp_mut_dict]
+
+	return amplicons_dict
+
 # hardcode
 # TODO compute from mutations
-amplicons={
- '72_UK': [21718, 21988, {21765: '------', 21991: '---'}],
- '78_UK': [23502, 23810, {23604: 'A', 23709: 'T'}],
- '92_UK': [27827, 28102, {27972: 'T', 28048: 'T', 28111: 'G'}],
- '93_UK': [28147, 28414, {28111: 'G', 28280: 'CTA'}],
- '76_SA': [22879, 23142, {23012: 'A', 23063: 'T'}],
-# '76_UK': [22879, 23142, {23063: 'T',23271: 'A'}],
- '77_EU': [23194, 23464, {23403: 'G'}],
-}
+# amplicons={
+#  '72_UK': [21718, 21988, {21765: '------', 21991: '---'}],
+#  '78_UK': [23502, 23810, {23604: 'A', 23709: 'T'}],
+#  '92_UK': [27827, 28102, {27972: 'T', 28048: 'T', 28111: 'G'}],
+#  '93_UK': [28147, 28414, {28111: 'G', 28280: 'CTA'}],
+#  '76_SA': [22879, 23142, {23012: 'A', 23063: 'T'}],
+# # '76_UK': [22879, 23142, {23063: 'T',23271: 'A'}],
+#  '77_EU': [23194, 23464, {23403: 'G'}],
+# }
+
+# load bedfile
+bedfile = "./nCoV-2019.insert.bed"
+amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
+
+# load all voc yamls
+vocdir = "./voc"
+loaded_yamls = []
+for path in os.listdir(vocdir):
+	full_path = os.path.join(vocdir, path)
+	with open(full_path, 'r') as file:
+		loaded_yaml = yaml.load(file, Loader=yaml.FullLoader)
+	loaded_yamls.append(loaded_yaml)
+
+# make amplicon dict for each voc
+all_amp_dict = []
+for yam in loaded_yamls:
+    all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["voc"]["short"]))
+# merge dicts
+amplicons = {k: v for dic in all_amp_dict for k, v in dic.items()}
+print(amplicons)
+
+
 # TODO autoguess reference from alignment
 rq_chr=args.rq_chr # e.g.: 'NC_045512.2'
 
@@ -195,7 +243,7 @@ else:
 # dumps, for being able to take it from here
 #
 if (args.dump) or (not (args.json or args.yaml)):
-    print(table)
+	print(table)
 if args.json:
 	with open(args.json, 'wt') as jf:
 		json.dump(obj=table, fp=jf)
