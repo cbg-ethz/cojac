@@ -25,6 +25,10 @@ argparser.add_argument('-p', '--prefix', metavar='PATH', required=False, default
 	type=str, dest='prefix', help="V-pipe work directory prefix for where to look at align files when using TSV samples list")
 argparser.add_argument('-r', '--reference', metavar='REFID', required=False, default='NC_045512.2',
 	type=str, dest='rq_chr', help="reference to look for in alignment files")
+argparser.add_argument('-m', '--vocdir', metavar='DIR', required=False, default="./voc",
+	type=str, dest='vocdir', help="directory containing the yamls defining the variant of concerns")
+argparser.add_argument('-b', '--bedfile', metavar='BED', required=False, default="./nCoV-2019.insert.bed",
+	type=str, dest='bedfile', help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand")
 argparser.add_argument('-j', '--json', metavar='JSON', required=False, default=None,
 	type=str, dest='json', help="output results to as JSON file")
 argparser.add_argument('-y', '--yaml', metavar='YAML', required=False, default=None,
@@ -192,11 +196,11 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 # }
 
 # load bedfile
-bedfile = "./nCoV-2019.insert.bed"
+bedfile = args.bedfile
 amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
 
 # load all voc yamls
-vocdir = "./voc"
+vocdir = args.vocdir
 loaded_yamls = []
 for path in os.listdir(vocdir):
 	full_path = os.path.join(vocdir, path)
