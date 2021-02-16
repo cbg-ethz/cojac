@@ -247,6 +247,7 @@ Long term goal:
 #### Additional notebooks:
 
  - [Lara Fuhrmann ![orcid]](https://orcid.org/0000-0001-6405-0654), [![github]](https://github.com/LaraFuhrmann)
+ - [Kim Philipp Jablonski ![orcid]](https://orcid.org/0000-0002-4166-4343), [![github]](https://github.com/kpj)
  - [Katharina Jahn ![orcid]](https://orcid.org/0000-0002-6983-4615), [![github]](https://github.com/jahnka)
 
 #### Corresponding author:
