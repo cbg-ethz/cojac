@@ -10,6 +10,7 @@ import json
 import yaml
 import gzip
 import pysam
+import re
 
 
 # parse command line
@@ -164,8 +165,8 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 		mut_df: dict with keys "position" and value "mutation" for each mutation to look for
 		voc_name: name given to the variant of concern
 	Returns:
-		amplicons_dict: dict() with entries of the form: 
-			*amplicon_number*_*voc_name* : [start, stop, {position1 : mutation1, position2 : mutation2 , ...}] 
+		amplicons_dict: dict() with entries of the form:
+			*amplicon_number*_*voc_name* : [start, stop, {position1 : mutation1, position2 : mutation2 , ...}]
 			for each amplicon where cooccurences could be found
 	"""
 	mut_df = pd.DataFrame({"position" : mut_dict.keys(), "mutation" : mut_dict.values()})
@@ -181,6 +182,68 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 			amplicons_dict["{}_{}".format(i+1, voc_name)] = [qstart, qstop, tmp_mut_dict]
 
 	return amplicons_dict
+
+rxmutdec=re.compile('^(?:(?:(?:(?P<ref>[ATCG]+)\>)?(?P<mut>[ATCG]+))|(?P<del>[\-]+)|(?:[\+](?P<ins>[ATGC]+)))$')
+
+def mut_decode(mutstr):
+	"""function to decode the strings of a mutation
+	mutation can specifie:
+	 - a single base (e.g.: 'C') or a run of bases ('CAT')
+	 - a substitution (e.g.: 'G>C'), can also be longer ('GTC>CAT')
+	 - a run of deletions ('---')
+	 - an insertions ('+TATA')
+
+	(Basically, this function strips the reference part)
+
+	Input:
+		a string with any of the above
+	Returns:
+		a string with bases or deletions (either single or runs)
+	"""
+
+	res=rxmutdec.match(mutstr)
+
+	if res:
+		match=res.groupdict()
+		if match['mut']:
+			#print(f"{mutstr} : mutation {match['mut']}")
+			return match['mut']
+		if match['del']:
+			#print(f"{mutstr} : deletion {match['del']}")
+			return match['del']
+		if match['ins']:
+			print(f"insertions not supported (yet): {mutstr} : {match['ins']}")
+			return None
+	print(f"cannot parse mutation f{mutstr}")
+	sys.exit(1)
+
+def filter_decode_vartiant(yam, categories=['mut','extra','shared','subset']):
+	"""function to filter mutations and decode the strings
+	mutations can be classified as:
+	 - 'mut': defining mut
+	 - 'extra': officially not counted as defining but still specific
+	 - 'shared': present in this variant, but also occuring outside of it (e.g.: common ancestror)
+	 - 'subset': only present on some variants (i.e.: 'not fixed')
+	mutation can be specifie:
+	 - a single base (e.g.: 'C') or a run of bases ('CAT')
+	 - a substitution (e.g.: 'G>C'), can also be longer ('GTC>CAT')
+	 - a run of deletions ('---')
+	 - an insertions ('+TATA')
+
+	Input:
+		yam: dictionnary loaded from a voc YAML
+		categories: a list of categories to filter-in
+	Returns:
+		voc: dict() with
+			'name': short name of the variant
+			'mut': a an ordereddict() of 'position': 'bases or deletions'
+	"""
+
+	return {
+		'name': yam['variant']['short'],
+		'mut':  { pos:mut_decode(mut) for c in categories if c in yam for(pos,mut) in yam[c].items() if mut_decode(mut) },
+	 }
+
 
 # hardcode
 # TODO compute from mutations
@@ -208,12 +271,12 @@ for path in [p for p in os.listdir(vocdir) if not p.startswith('.')]:
 	full_path = os.path.join(vocdir, path)
 	with open(full_path, 'r') as file:
 		loaded_yaml = yaml.load(file, Loader=yaml.FullLoader)
-	loaded_yamls.append(loaded_yaml)
+	loaded_yamls.append(filter_decode_vartiant(loaded_yaml))
 
 # make amplicon dict for each voc
 all_amp_dict = []
 for yam in loaded_yamls:
-	all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["voc"]["short"]))
+	all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["name"]))
 # merge dicts
 amplicons = {k: v for dic in all_amp_dict for k, v in dic.items()}
 print(amplicons)
