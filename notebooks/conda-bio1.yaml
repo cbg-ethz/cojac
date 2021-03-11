@@ -1,0 +1,27 @@
+name: bio1
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - python
+  - pandas
+  - numpy 
+  - matplotlib 
+  - seaborn
+  - plotly 
+  - ipykernel 
+  - ipywidgets 
+  - pysam 
+  - biopython
+  - termcolor 
+  - strictyaml
+  - bcbio-gff
+  - psycopg2
+
+# don't forget to run:
+# ```
+# conda activate bio1
+# python -m ipykernel install --user --name=bio1
+# ```
+
