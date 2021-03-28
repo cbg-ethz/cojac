@@ -24,12 +24,14 @@ inputgroup.add_argument('-a', '--alignments', metavar='BAM/CRAM', nargs='+',
 	dest='alignments', help="alignment files")
 argparser.add_argument('-p', '--prefix', metavar='PATH', required=False, default="working/samples",
 	type=str, dest='prefix', help="V-pipe work directory prefix for where to look at align files when using TSV samples list")
-argparser.add_argument('-r', '--reference', metavar='REFID', required=False, default='NC_045512.2',
+argparser.add_argument('-r', '--reference', metavar='REFID', required=False, default=None, # default='NC_045512.2',
 	type=str, dest='rq_chr', help="reference to look for in alignment files")
 argparser.add_argument('-m', '--vocdir', metavar='DIR', required=False, default="./voc",
 	type=str, dest='vocdir', help="directory containing the yamls defining the variant of concerns")
 argparser.add_argument('-b', '--bedfile', metavar='BED', required=False, default="./nCoV-2019.insert.bed",
 	type=str, dest='bedfile', help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand")
+argparser.add_argument('-#', '--cooc', metavar='COOC',  required=False, default=2,
+	type=int, dest='cooc', help="minimum number of cooccurences to search for")
 argparser.add_argument('-j', '--json', metavar='JSON', required=False, default=None,
 	type=str, dest='json', help="output results to as JSON file")
 argparser.add_argument('-y', '--yaml', metavar='YAML', required=False, default=None,
@@ -86,6 +88,8 @@ def test_read(read, mut_dict):
 		return (found_site, found_mut)
 	else: # sites present, but no mutation found
 		return (found_site, None)
+
+
 # scan an amplicon for a specific set of mutations
 def scanamplicon(read_iter, mut_dict):
 	# TODO inefficient, could be streamed (with an accumulator for pairs)
@@ -140,10 +144,16 @@ def findbam(prefix, batch, sample):
 	return alnfname
 
 
-def scanbam(alnfname, amplicons):
+def scanbam(alnfname, amplicons, rq_chr):
 	'''scan a bamfile found at alnfname'''
 	amp_results={}
 	with pysam.AlignmentFile(alnfname, "rb") as alnfile:
+		if rq_chr == None:
+			# autoguess reference from alignment
+			# HACK only using the first one
+			# TODO handle multiple fragments (in the request itself)
+			rq_chr=alnfile.references[0]
+			print(f"autodecting reference as {rq_chr}")
 		for amp_name,amp in amplicons.items():
 			(rq_b,rq_e,mut_dict)=amp
 
@@ -158,12 +168,14 @@ def scanbam(alnfname, amplicons):
 	return amp_results
 
 
-def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
+def make_amplicons_dict(amp_bed, mut_dict, voc_name="", cooc=2):
 	"""function to make a dictionnary of places to look for coocurences of mutations.
 	Input:
 		amp_bed: pd.DataFrame with columns "qstart" and "qstop" of the query start and stop positions of the amplicons.
 		mut_df: dict with keys "position" and value "mutation" for each mutation to look for
 		voc_name: name given to the variant of concern
+	optional:
+		cooc: amplicons must have at lest that many variants
 	Returns:
 		amplicons_dict: dict() with entries of the form:
 			*amplicon_number*_*voc_name* : [start, stop, {position1 : mutation1, position2 : mutation2 , ...}]
@@ -171,6 +183,8 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 	"""
 	mut_df = pd.DataFrame({"position" : mut_dict.keys(), "mutation" : mut_dict.values()})
 	amplicons_dict = {}
+
+	mincoocthresh = cooc if len(mut_dict) > 1 else 1 # HACK exception for early B.1 variant defined by a single mutation (A23403G : D614G aka Doug)
 	for i in range(amp_bed.shape[0]):
 		start, end, qstart, qstop = amp_bed.iloc[i].loc[["start", "stop", "qstart", "qstop"]]
 		t_df = mut_df[(start <= mut_df["position"]) & (mut_df["position"] <= end)]
@@ -178,7 +192,7 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name=""):
 		for j in range(t_df.shape[0]):
 			tmp_mut_dict[t_df.iloc[j]["position"]] = t_df.iloc[j]["mutation"]
 
-		if len(tmp_mut_dict) > 1:
+		if len(tmp_mut_dict) >= mincoocthresh:
 			amplicons_dict["{}_{}".format(i+1, voc_name)] = [qstart, qstop, tmp_mut_dict]
 
 	return amplicons_dict
@@ -244,19 +258,6 @@ def filter_decode_vartiant(yam, categories=['mut','extra','shared','subset']):
 		'mut':  { pos:mut_decode(mut) for c in categories if c in yam for(pos,mut) in yam[c].items() if mut_decode(mut) },
 	 }
 
-
-# hardcode
-# TODO compute from mutations
-# amplicons={
-#  '72_UK': [21718, 21988, {21765: '------', 21991: '---'}],
-#  '78_UK': [23502, 23810, {23604: 'A', 23709: 'T'}],
-#  '92_UK': [27827, 28102, {27972: 'T', 28048: 'T', 28111: 'G'}],
-#  '93_UK': [28147, 28414, {28111: 'G', 28280: 'CTA'}],
-#  '76_SA': [22879, 23142, {23012: 'A', 23063: 'T'}],
-# # '76_UK': [22879, 23142, {23063: 'T',23271: 'A'}],
-#  '77_EU': [23194, 23464, {23403: 'G'}],
-# }
-
 # load bedfile
 bedfile = args.bedfile
 amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
@@ -274,15 +275,30 @@ for path in [p for p in os.listdir(vocdir) if not p.startswith('.')]:
 	loaded_yamls.append(filter_decode_vartiant(loaded_yaml))
 
 # make amplicon dict for each voc
-all_amp_dict = []
+amplicons = { }
+numbers = { }
 for yam in loaded_yamls:
-	all_amp_dict.append(make_amplicons_dict(amp_bed, yam["mut"], yam["name"]))
-# merge dicts
-amplicons = {k: v for dic in all_amp_dict for k, v in dic.items()}
-print(amplicons)
+	amp_dict=make_amplicons_dict(amp_bed, yam["mut"], yam["name"], args.cooc)
+
+	# merge identical amplicons from different variants
+	# e.g.: P.1 and 501Y.V2 share amplicon 76 with following mutations
+	#  - G23012A  E484K
+	#  - A23063T  N501Y
+	# both on Spike's RBD
+	for (k1,d) in list(amp_dict.items()): # WARNING inefficient but functional
+		if d in amplicons.values():
+			k2=list(amplicons.keys())[list(amplicons.values()).index(d)]
+			print(f"{k1} is identical to {k2}")
+			amplicons['_'.join([k2, yam["name"]])]=amplicons.pop(k2)
+			del amp_dict[k1]
+			break
+
+	# merge dicts
+	if len(amp_dict):
+		amplicons.update(amp_dict)
 
 
-# TODO autoguess reference from alignment
+
 rq_chr=args.rq_chr # e.g.: 'NC_045512.2'
 
 
@@ -293,19 +309,16 @@ if args.samples is not None:
 	with open(args.samples,'rt',encoding='utf-8', newline='') as tf:	# this file has the same content as the original experiment
 		for r in csv.reader(tf, delimiter='\t'): #dialect='excel-tab'):
 			sample,batch=r[:2]
-			#i+=1
-			#if (i==3):
-				#break;
 			print(sample)
 			alnfname = findbam(args.prefix, batch, sample)
-			table[sample]=scanbam(alnfname, amplicons)
+			table[sample]=scanbam(alnfname, amplicons,rq_chr)
 
 # loop for if samples are given through -a option
 # this option can also de used to dispatch per sample jobx on the cluster
 else:
 	for alnfname in args.alignments:
 		sample = alnfname # HACK use the whole BAM file as sample name
-		table[sample]=scanbam(alnfname, amplicons)
+		table[sample]=scanbam(alnfname, amplicons,rq_chr)
 
 
 #
