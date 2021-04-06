@@ -22,6 +22,8 @@ inputgroup.add_argument('-s', '--samples', metavar='TSV',
 	type=str, dest='samples', help="V-pipe samples list tsv")
 inputgroup.add_argument('-a', '--alignments', metavar='BAM/CRAM', nargs='+',
 	dest='alignments', help="alignment files")
+argparser.add_argument('-/', '--batchname', nargs='?', const='/', default=None,
+	dest='batchname', help = "concatenate samplename/batchname from samples tsv")
 argparser.add_argument('-p', '--prefix', metavar='PATH', required=False, default="working/samples",
 	type=str, dest='prefix', help="V-pipe work directory prefix for where to look at align files when using TSV samples list")
 argparser.add_argument('-r', '--reference', metavar='REFID', required=False, default=None, # default='NC_045512.2',
@@ -311,7 +313,7 @@ if args.samples is not None:
 			sample,batch=r[:2]
 			print(sample)
 			alnfname = findbam(args.prefix, batch, sample)
-			table[sample]=scanbam(alnfname, amplicons,rq_chr)
+			table[f"{sample}{args.batchname}{batch}" if args.batchname else sample]=scanbam(alnfname, amplicons,rq_chr)
 
 # loop for if samples are given through -a option
 # this option can also de used to dispatch per sample jobx on the cluster

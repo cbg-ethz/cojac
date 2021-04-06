@@ -27,6 +27,8 @@ dialectgroup.add_argument('-e', '--escape',
 	dest='escape', help = "use escape characters for newlines")
 dialectgroup.add_argument('-x', '--excel',
 	action='store_true', dest='semi', help = "use a semi-colon ';' instead of a comma ',' in the comma-separated-files as required by Microsoft Excel")
+argparser.add_argument('-/', '--batchname', nargs='?', const='/', default=None,
+	dest='batchname', help = "split samplename/batchname (as in samples tsv)")
 argparser.add_argument('-q', '--quiet',
 	action="store_true", dest='quiet', help = "Run quietly: do not print the table")
 args = argparser.parse_args()
@@ -55,8 +57,15 @@ assert len(table) > 0, "cannot succesfully load table"
 
 df_dict={}
 for sam,amplicons in table.items():
-	df_dict[sam]={}
 	print(sam)
+	# table key
+	ksam = None
+	if args.batchname:
+			(sam,ignore,batch) = sam.rpartition(args.batchname)
+			ksam = (sam,batch)
+	else:
+			ksam = sam
+	df_dict[ksam]={}
 
 	for ampname,amp in amplicons.items():
 		# get topmost
@@ -73,7 +82,7 @@ for sam,amplicons in table.items():
 			muts_cnt = 0
 
 		# pack into dict for pandas
-		df_dict[sam].update({
+		df_dict[ksam].update({
 			ampname: f"{muts_cnt} / {sites_cnt}{args.escape[0]}{f'{100*float(muts_cnt)/float(sites_cnt) :.2f}%' if sites_cnt else 'NA'}"
 		})
 
