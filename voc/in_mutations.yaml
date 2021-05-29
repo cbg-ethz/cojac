@@ -1,0 +1,33 @@
+variant:
+  short: 'IN'
+  pangolin: 'B.1.617.1'
+  nextstrain: '21A/S:154K'
+  voc: 'VUI-21APR-01'
+source:
+  - doi:10.1101/2021.04.23.441101
+  - https://www.gov.uk/government/publications/investigation-of-novel-sars-cov-2-variant-variant-of-concern-20201201#attachment_5216392
+threshold: 5
+mut:
+  # ORF1ab
+  3457:  'C>T' # syn  nsp3
+  4965:  'C>T' # T1567I  nsp3:T749I
+  11201: 'A>G' # T3646A nsp6:T77A 
+  17523: 'G>T' # M5753I nsp13:M429I 
+  20396: 'A>G' # K6711R  nsp15:K259R
+  # S
+  21895: 'T>C' # syn
+  22022: 'G>A' # E154K
+  22917: 'T>G' # L452R
+  22995: 'C>A' # T478K (only in sub variant 2)
+  23012: 'G>C' # E484Q (not in sub variant 2)
+  23604: 'C>G' # P681R
+  # ORF3a
+  25469: 'C>T' # S26L
+  # ORF7a
+  27638: 'T>C' # V82A
+  # N
+  28881: 'G>T' # R203M
+
+# Nextrain
+#  29402	T
+
