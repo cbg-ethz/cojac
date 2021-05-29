@@ -6,8 +6,9 @@ channels:
 dependencies:
   - python
   - pandas
-  - numpy 
-  - matplotlib 
+  - numpy
+  - natsort
+  - matplotlib
   - seaborn
   - plotly 
   - ipykernel 
@@ -17,6 +18,7 @@ dependencies:
   - termcolor 
   - strictyaml
   - bcbio-gff
+  - rpy2
   - psycopg2
 
 # don't forget to run:
