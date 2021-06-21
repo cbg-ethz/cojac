@@ -1,5 +1,6 @@
 variant:
   short: 'ZA'
+  who: 'beta'
   pangolin: 'B.1.351'
   nextstrain: '20H/501Y.V2'
   voc: 'VOC-202012/02'
