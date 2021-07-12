@@ -8,7 +8,6 @@ import csv
 import json
 import yaml
 import gzip
-import pysam
 
 
 # parse command line
