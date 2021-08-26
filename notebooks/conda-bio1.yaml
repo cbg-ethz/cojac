@@ -15,6 +15,7 @@ dependencies:
   - ipywidgets 
   - pysam 
   - biopython
+  - scikit-learn
   - termcolor 
   - strictyaml
   - bcbio-gff
