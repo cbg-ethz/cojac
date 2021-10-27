@@ -1,44 +1,35 @@
 variant:
-  short: 'MU'
-  who: 'mu'
-  pangolin: 'B.1.621'
-  nextstrain: '21H'
+  voc: VUI-21JUL-01
+  pheuid: kelp-lesser
+  short: mu
+  pangolin: B.1.621
+  nextstrain: ''
 source:
-  - https://www.medrxiv.org/content/10.1101/2021.05.08.21256619v1.full.pdf
+- https://cov-lineages.org/lineage.html?lineage=B.1.621
+- https://github.com/cov-lineages/pango-designation/issues/57
 threshold: 5
 mut:
   # ORF1ab
-  3428: 'A>G' # T1055A
-  4878: 'C>T' # T1538I
-  11451: 'A>G' # Q3729R
-  14408: 'C>T' # P4715L
-  17491: 'C>T' # P5743S
-
-  # ORF3a
-  25563: 'G>T' # Q57H
-  26158: '----' # V256- !FRAMESHIFT
-
-  # ORF8
-  27924: 'A>C' # T11K
-  28005: 'C>T' # P38S
-  28093: 'C>T' # S67F
-
+  3428: 'A>G' # nsp3:T237A
+  4878: 'C>T' # nsp3:T720I
+  6037: 'C>T' # syn nsp3
+  11451: 'A>G' # nsp6:Q160R
+  13057: 'A>T' # syn nsp10
+  20148: 'C>T' # syn nsp15
   # S
-  21846: 'C>T' # T95I
-  21992: 'TA>AC' # Y144T
-  21996: 'AC>CT' # Y145S
-  21996: 'AC>CT' # Y145S
-  21998: '--->AAC' # 146N insertion
-  22599: 'G>A' # R346K
-  23012: 'G>A' # E484K
-  23063: 'A>T' # N501Y 
-  23604: 'C>A' # P681H
-
+  21846: 'C>T' # surface glycoprotein:T95I
+  22599: 'G>A' # surface glycoprotein:R346K
+  23012: 'G>A' # surface glycoprotein:E484K
+  23604: 'C>A' # surface glycoprotein:P681H
+  # .
+  26492: 'A>T'
+  # ORF8
+  27925: 'C>A' # ORF8 protein:T11K
+  28005: 'C>T' # ORF8 protein:P38S
   # N
-
-  
+  28887: 'C>T' # nucleocapsid phosphoprotein:T205I
 extra:
-shared:
-
-subset:
-
+  # S
+  21991: '+ACT'
+  # ORF3a
+  26158: '----'

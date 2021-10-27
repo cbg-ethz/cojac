@@ -1,14 +1,10 @@
 variant:
-  voc: 'VOC-21APR-02'
-  who: 'delta'
-  pheuid: 'empathy-serve'
-  short: 'IN2'
-  pangolin: 'B.1.617.2'
-  nextstrain: '21A'
+  short: 'AY42'
+  pangolin: 'AY.4.2'
 source:
-- https://github.com/cov-lineages/pango-designation/issues/49
-- https://github.com/cov-lineages/pango-designation/issues/180
-- https://github.com/cov-lineages/pango-designation/issues/223
+  - https://github.com/cov-lineages/pango-designation/issues/49
+  - https://github.com/cov-lineages/pango-designation/issues/180
+  - https://github.com/cov-lineages/pango-designation/issues/223
 threshold: 5
 mut:
   # S
@@ -27,7 +23,7 @@ mut:
   27638: 'T>C' # ORF7a protein:V82A
   27752: 'C>T' # ORF7a protein:T120I
   # N
-#  28461: 'A>G' # nucleocapsid phosphoprotein:D63G  #found to be problematic in ww samples
+  #28461: 'A>G' # nucleocapsid phosphoprotein:D63G  #found to be problematic in ww samples
   28881: 'G>T' # nucleocapsid phosphoprotein:R203M
   29402: 'G>T' # nucleocapsid phosphoprotein:D377Y
   

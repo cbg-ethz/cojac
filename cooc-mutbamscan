@@ -157,7 +157,7 @@ def scanbam(alnfname, amplicons, rq_chr):
 			rq_chr=alnfile.references[0]
 			print(f"autodecting reference as {rq_chr}")
 		for amp_name,amp in amplicons.items():
-			(rq_b,rq_e,mut_dict)=amp
+			(start,stop,rq_b,rq_e,mut_dict)=amp
 
 			# we need at least 2 to compute co-occurrence
 			if len(mut_dict) < 1: # HACK 2:
@@ -195,7 +195,7 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name="", cooc=2):
 			tmp_mut_dict[t_df.iloc[j]["position"]] = t_df.iloc[j]["mutation"]
 
 		if len(tmp_mut_dict) >= mincoocthresh:
-			amplicons_dict["{}_{}".format(i+1, voc_name)] = [qstart, qstop, tmp_mut_dict]
+			amplicons_dict["{}_{}".format(i+1, voc_name)] = [start, end, qstart, qstop, tmp_mut_dict]
 
 	return amplicons_dict
 
