@@ -1,5 +1,5 @@
 variant:
-  voc: VUI-21NOV-01
+  voc: VOC-21NOV-01
   pheuid: pentagon-refining
   short: om
   pangolin: B.1.1.529
@@ -16,8 +16,7 @@ mut:
   18163: 'A>G' # nsp14:I42V
   # S
   22578: 'G>A' # surface glycoprotein:G339D
-  22673: 'T>C' # surface glycoprotein:S371P
-  22674: 'C>T' # surface glycoprotein:S371F
+  22673: 'TCC>CTC' # surface glycoprotein:S371L
   22679: 'T>C' # surface glycoprotein:S373P
   22813: 'G>T' # surface glycoprotein:K417N
   22882: 'T>G' # surface glycoprotein:N440K

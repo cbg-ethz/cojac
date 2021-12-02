@@ -7,7 +7,7 @@ variant:
   nextstrain: '21A'
 source:
 - https://github.com/cov-lineages/pango-designation/issues/49
-threshold: 5
+threshold: 4
 mut:
   # S
   21618: 'C>G' # surface glycoprotein:T19R
