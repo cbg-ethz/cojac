@@ -266,6 +266,9 @@ amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool"
 # make query start and query end for each amplicon
 amp_bed["qstart"] = pd.concat([amp_bed["start"][0:1], amp_bed["stop"][:-1]]).reset_index(drop=True) + 30
 amp_bed["qstop"] = pd.concat([amp_bed["start"][1:], amp_bed["stop"][-1:]]).reset_index(drop=True) - 30
+tmp_filter = amp_bed["qstart"]>=amp_bed["qstop"]
+amp_bed.loc[tmp_filter, "qstart"]=((amp_bed["start"]+amp_bed["stop"])/2-5).astype("int")
+amp_bed.loc[tmp_filter, "qstop"]=((amp_bed["start"]+amp_bed["stop"])/2+5).astype("int")
 
 # load all voc yamls
 vocdir = args.vocdir
