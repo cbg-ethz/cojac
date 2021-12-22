@@ -147,8 +147,8 @@ def main():
         test if mutations listed in mut_dict are present in the pysam read
 
         returns a list with:
-                found_site:	list of site present in the read (no matter content)
-                found_mut:	list of those position which have the mutations variant
+                found_site: list of site present in the read (no matter content)
+                found_mut: list of those position which have the mutations variant
         """
 
         # WARNING pysam is 0-based! (see here: https://pysam.readthedocs.io/en/latest/faq.html#pysam-coordinates-are-wrong )
