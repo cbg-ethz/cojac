@@ -8,98 +8,129 @@ import strictyaml
 import argparse
 
 
-
-argparser = argparse.ArgumentParser(description="convert phe-genomics to cojac's dedicated variant YAML format")
-argparser.add_argument('-s', '--shortname', metavar='SHRT', required=False, default=None,
-	type=str, dest='shortname', help = "shortname to use (otherwise auto-build one based on phe-genomic's unique id)")
-argparser.add_argument('-y', '--yaml', metavar='OUT_YAML', nargs='?', const='', required=False, default=None,
-	type=str, dest='outname', help="write cojac variant to a YAML file instead of printing (if empty, build filename from shortname)")
-argparser.add_argument('fname', metavar='IN_YAML', nargs=1, default=None,
-	type=str, help='phe-genomics variant YAML input file')
+argparser = argparse.ArgumentParser(
+    description="convert phe-genomics to cojac's dedicated variant YAML format"
+)
+argparser.add_argument(
+    "-s",
+    "--shortname",
+    metavar="SHRT",
+    required=False,
+    default=None,
+    type=str,
+    dest="shortname",
+    help="shortname to use (otherwise auto-build one based on phe-genomic's unique id)",
+)
+argparser.add_argument(
+    "-y",
+    "--yaml",
+    metavar="OUT_YAML",
+    nargs="?",
+    const="",
+    required=False,
+    default=None,
+    type=str,
+    dest="outname",
+    help="write cojac variant to a YAML file instead of printing (if empty, build filename from shortname)",
+)
+argparser.add_argument(
+    "fname",
+    metavar="IN_YAML",
+    nargs=1,
+    default=None,
+    type=str,
+    help="phe-genomics variant YAML input file",
+)
 args = argparser.parse_args()
 
 
-fname = args.fname[0]	# e.g.: 'variant_definitions/variant_yaml/habitable-pasty.yml'
-short = args.shortname	# either None or e.g.: IN
-outname = args.outname	# None: don't write, '' use shortname or 'filename'
+fname = args.fname[0]  # e.g.: 'variant_definitions/variant_yaml/habitable-pasty.yml'
+short = args.shortname  # either None or e.g.: IN
+outname = args.outname  # None: don't write, '' use shortname or 'filename'
 
 # phe-genomics input
-with open(fname, 'r') as yf:
-	yam = strictyaml.dirty_load(yf.read(), allow_flow_style=True).data
+with open(fname, "r") as yf:
+    yam = strictyaml.dirty_load(yf.read(), allow_flow_style=True).data
 
 # cojac yaml output
 
 # general metadata
 outy = {
-	'variant': { 'voc': yam['phe-label'], 'pheuid': yam['unique-id'] },
-	'source': yam['information-sources'],
-	'threshold': int(yam['calling-definition']['probable']['mutations-required']),
+    "variant": {"voc": yam["phe-label"], "pheuid": yam["unique-id"]},
+    "source": yam["information-sources"],
+    "threshold": int(yam["calling-definition"]["probable"]["mutations-required"]),
 }
 
-rxshortify = re.compile('^([a-z]{2})[^-]*-([a-z]{2})')
+rxshortify = re.compile("^([a-z]{2})[^-]*-([a-z]{2})")
 
-outy['variant']['short'] = short if short else ''.join(rxshortify.search(yam['unique-id']).group(1,2))
+outy["variant"]["short"] = (
+    short if short else "".join(rxshortify.search(yam["unique-id"]).group(1, 2))
+)
 
-for bl in yam['belongs-to-lineage']:
-	for (s,l) in bl.items():
-		if s == 'PANGO':
-			outy['variant']['pangolin']=l
-		elif s == 'nextstrain':
-			outy['variant']['nextstrain']=l
-		else:
-			print(f"unkown {s}:{l}")
+for bl in yam["belongs-to-lineage"]:
+    for (s, l) in bl.items():
+        if s == "PANGO":
+            outy["variant"]["pangolin"] = l
+        elif s == "nextstrain":
+            outy["variant"]["nextstrain"] = l
+        else:
+            print(f"unkown {s}:{l}")
 
 
 # parse mutations
-defcat='mut'
-indelscat= 'extra' if 0==int(yam['calling-definition']['probable']['indels-required']) else defcat
+defcat = "mut"
+indelscat = (
+    "extra"
+    if 0 == int(yam["calling-definition"]["probable"]["indels-required"])
+    else defcat
+)
 gene = {defcat: None, indelscat: None}
-variants = {defcat: '', indelscat: ''}
-for v in yam['variants']:
-	# TODO depending on phe-genomics issue #9 also handle 'shared' and 'subset'
+variants = {defcat: "", indelscat: ""}
+for v in yam["variants"]:
+    # TODO depending on phe-genomics issue #9 also handle 'shared' and 'subset'
 
-	cat = defcat
-	os = ''
+    cat = defcat
+    os = ""
 
-	# actual mutation
-	if v['type'] == 'SNP' or v['type'] == 'MNP':
-		os += f"  {v['one-based-reference-position']}: '{v['reference-base']}>{v['variant-base']}'"
-	elif v['type'] == 'deletion':
-		cat = indelscat
-		os += f"  {1+int(v['one-based-reference-position'])}: '{ '-' * (len(v['reference-base'])-len(v['variant-base'])) }'"
-	elif v['type'] == 'insertion':
-		cat = indelscat
-		os += f"  {1+int(v['one-based-reference-position'])}: '+{ v['variant-base'][(len(v['reference-base'])):] }'"
+    # actual mutation
+    if v["type"] == "SNP" or v["type"] == "MNP":
+        os += f"  {v['one-based-reference-position']}: '{v['reference-base']}>{v['variant-base']}'"
+    elif v["type"] == "deletion":
+        cat = indelscat
+        os += f"  {1+int(v['one-based-reference-position'])}: '{ '-' * (len(v['reference-base'])-len(v['variant-base'])) }'"
+    elif v["type"] == "insertion":
+        cat = indelscat
+        os += f"  {1+int(v['one-based-reference-position'])}: '+{ v['variant-base'][(len(v['reference-base'])):] }'"
 
-	# comments
-	if 'amino-acid-change' in v:
-		os += f" # {(v['protein']+':') if 'protein' in v else ''}{v['amino-acid-change']}\n"
-	elif 'predicted-effect' in v and v['predicted-effect'] == 'synonymous':
-		os += f" # syn{(' '+v['protein']) if 'protein' in v else ''}\n"
-	else:
-		os += "\n"
+    # comments
+    if "amino-acid-change" in v:
+        os += f" # {(v['protein']+':') if 'protein' in v else ''}{v['amino-acid-change']}\n"
+    elif "predicted-effect" in v and v["predicted-effect"] == "synonymous":
+        os += f" # syn{(' '+v['protein']) if 'protein' in v else ''}\n"
+    else:
+        os += "\n"
 
-	# gene section header
-	if gene[cat] != v['gene']:
-		gene[cat] = v['gene']
-		variants[cat] += f"  # { v['gene'] }\n"
+    # gene section header
+    if gene[cat] != v["gene"]:
+        gene[cat] = v["gene"]
+        variants[cat] += f"  # { v['gene'] }\n"
 
-	variants[cat] += os
+    variants[cat] += os
 
 
 # auto derive output name from shortname
-if outname is not None and outname == '':
-	outname=f"{outy['variant']['short'].lower()}_mutations.yaml"
+if outname is not None and outname == "":
+    outname = f"{outy['variant']['short'].lower()}_mutations.yaml"
 # HACK None, '', string tri-state is a hackish bad idea
 
 # start writing
-with open(outname, 'wt') if outname is not None else sys.stdout as yf:
-	print(yaml.dump(outy, sort_keys=False), end='', file=yf)
-	for (t,s) in variants.items():
-		if 0==len(s):
-			continue
-		print(f"{t}:", file=yf)
-		print(s, end='', file=yf)
+with open(outname, "wt") if outname is not None else sys.stdout as yf:
+    print(yaml.dump(outy, sort_keys=False), end="", file=yf)
+    for (t, s) in variants.items():
+        if 0 == len(s):
+            continue
+        print(f"{t}:", file=yf)
+        print(s, end="", file=yf)
 
 sys.exit(0)
 
