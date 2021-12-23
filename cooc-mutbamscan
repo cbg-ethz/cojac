@@ -17,7 +17,7 @@ import re
 argparser = argparse.ArgumentParser(fromfile_prefix_chars='@', # support pass BAM list in file instead of parameters
 	description="scan amplicon (covered by long read pairs) for mutation cooccurrence",
 	epilog="@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line")
-inputgroup = argparser.add_mutually_exclusive_group(required=True)
+inputgroup = argparser.add_mutually_exclusive_group(required=False)
 inputgroup.add_argument('-s', '--samples', metavar='TSV',
 	type=str, dest='samples', help="V-pipe samples list tsv")
 inputgroup.add_argument('-a', '--alignments', metavar='BAM/CRAM', nargs='+',
@@ -34,6 +34,11 @@ argparser.add_argument('-b', '--bedfile', metavar='BED', required=False, default
 	type=str, dest='bedfile', help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand")
 argparser.add_argument('-#', '--cooc', metavar='COOC',  required=False, default=2,
 	type=int, dest='cooc', help="minimum number of cooccurences to search for")
+ampgroup = argparser.add_mutually_exclusive_group(required=False)
+ampgroup.add_argument('-Q', '--in-amp', '--amplicons', metavar='YAML', required=False, default=None,
+	type=str, dest='inamp', help="use the supplied YAML file to query amplicons instead of building it from BED + voc's DIR")
+ampgroup.add_argument('-A', '--out-amp', '--out-amplicons', metavar='YAML', required=False, default=None,
+	type=str, dest='outamp', help="output amplicon query in a YAML file")
 argparser.add_argument('-j', '--json', metavar='JSON', required=False, default=None,
 	type=str, dest='json', help="output results to as JSON file")
 argparser.add_argument('-y', '--yaml', metavar='YAML', required=False, default=None,
@@ -44,12 +49,18 @@ argparser.add_argument('-d', '--dump',
 	action="store_true", dest='dump', help = "dump the python object to the terminal")
 args = argparser.parse_args()
 
+if args.inamp is not None:
+	assert os.path.isfile(args.inamp), f"cannot find result yaml file {args.yaml}"
 
-if args.samples is  not None:
+if args.samples is not None:
 	assert os.path.isfile(args.samples), f"cannot find sample file {args.samples}"
-else:
+elif args.alignments is not None:
 	for align in args.alignments:
 		assert os.path.isfile(align), f"cannot find alginment file {align}"
+elif not args.outamp:
+	print("at least one of --alignements --samples or --out-amplicons need to be specified")
+	sys.exit(2)
+
 
 
 def test_read(read, mut_dict):
@@ -260,47 +271,58 @@ def filter_decode_vartiant(yam, categories=['mut','extra','shared','subset']):
 		'mut':  { pos:mut_decode(mut) for c in categories if c in yam for(pos,mut) in yam[c].items() if mut_decode(mut) },
 	 }
 
-# load bedfile
-bedfile = args.bedfile
-amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
-# make query start and query end for each amplicon
-amp_bed["qstart"] = pd.concat([amp_bed["start"][0:1], amp_bed["stop"][:-1]]).reset_index(drop=True) + 30
-amp_bed["qstop"] = pd.concat([amp_bed["start"][1:], amp_bed["stop"][-1:]]).reset_index(drop=True) - 30
-tmp_filter = amp_bed["qstart"]>=amp_bed["qstop"]
-amp_bed.loc[tmp_filter, "qstart"]=((amp_bed["start"]+amp_bed["stop"])/2-5).astype("int")
-amp_bed.loc[tmp_filter, "qstop"]=((amp_bed["start"]+amp_bed["stop"])/2+5).astype("int")
-
-# load all voc yamls
-vocdir = args.vocdir
-loaded_yamls = []
-for path in [p for p in os.listdir(vocdir) if not p.startswith('.')]:
-	full_path = os.path.join(vocdir, path)
-	with open(full_path, 'r') as file:
-		loaded_yaml = yaml.load(file, Loader=yaml.FullLoader)
-	loaded_yamls.append(filter_decode_vartiant(loaded_yaml))
-
-# make amplicon dict for each voc
 amplicons = { }
-numbers = { }
-for yam in loaded_yamls:
-	amp_dict=make_amplicons_dict(amp_bed, yam["mut"], yam["name"], args.cooc)
+if args.inamp is not None:
+	with open(args.inamp, 'rt') as yf:
+		# TODO type: force convert into numpy
+		amplicons=yaml.safe_load(yf)
 
-	# merge identical amplicons from different variants
-	# e.g.: P.1 and 501Y.V2 share amplicon 76 with following mutations
-	#  - G23012A  E484K
-	#  - A23063T  N501Y
-	# both on Spike's RBD
-	for (k1,d) in list(amp_dict.items()): # WARNING inefficient but functional
-		if d in amplicons.values():
-			k2=list(amplicons.keys())[list(amplicons.values()).index(d)]
-			print(f"{k1} is identical to {k2}")
-			amplicons['_'.join([k2, yam["name"]])]=amplicons.pop(k2)
-			del amp_dict[k1]
-			break
+else:
+	# load bedfile
+	bedfile = args.bedfile
+	amp_bed = pd.read_table(bedfile, names=["ref","start", "stop", "amp_num", "pool", "strand"])
+	# make query start and query end for each amplicon
+	amp_bed["qstart"] = pd.concat([amp_bed["start"][0:1], amp_bed["stop"][:-1]]).reset_index(drop=True) + 30
+	amp_bed["qstop"] = pd.concat([amp_bed["start"][1:], amp_bed["stop"][-1:]]).reset_index(drop=True) - 30
+	tmp_filter = amp_bed["qstart"]>=amp_bed["qstop"]
+	amp_bed.loc[tmp_filter, "qstart"]=((amp_bed["start"]+amp_bed["stop"])/2-5).astype("int")
+	amp_bed.loc[tmp_filter, "qstop"]=((amp_bed["start"]+amp_bed["stop"])/2+5).astype("int")
 
-	# merge dicts
-	if len(amp_dict):
-		amplicons.update(amp_dict)
+	# load all voc yamls
+	vocdir = args.vocdir
+	loaded_yamls = []
+	for path in [p for p in os.listdir(vocdir) if not p.startswith('.')]:
+		full_path = os.path.join(vocdir, path)
+		with open(full_path, 'r') as file:
+			loaded_yaml = yaml.load(file, Loader=yaml.FullLoader)
+		loaded_yamls.append(filter_decode_vartiant(loaded_yaml))
+
+	# make amplicon dict for each voc
+	amplicons = { }
+	for yam in loaded_yamls:
+		amp_dict=make_amplicons_dict(amp_bed, yam["mut"], yam["name"], args.cooc)
+
+		# merge identical amplicons from different variants
+		# e.g.: P.1 and 501Y.V2 share amplicon 76 with following mutations
+		#  - G23012A  E484K
+		#  - A23063T  N501Y
+		# both on Spike's RBD
+		for (k1,d) in list(amp_dict.items()): # WARNING inefficient but functional
+			if d in amplicons.values():
+				k2=list(amplicons.keys())[list(amplicons.values()).index(d)]
+				print(f"{k1} is identical to {k2}")
+				amplicons['_'.join([k2, yam["name"]])]=amplicons.pop(k2)
+				del amp_dict[k1]
+				break
+
+		# merge dicts
+		if len(amp_dict):
+			amplicons.update(amp_dict)
+
+	if args.outamp:
+		# TODO type: force convert into standard YAML and python types
+		with open(args.outamp, 'wt') as yf:
+			print(yaml.dump(amplicons, sort_keys=False), file=yf)
 
 
 
@@ -320,10 +342,12 @@ if args.samples is not None:
 
 # loop for if samples are given through -a option
 # this option can also de used to dispatch per sample jobx on the cluster
-else:
+elif args.alignments is not None:
 	for alnfname in args.alignments:
 		sample = alnfname # HACK use the whole BAM file as sample name
 		table[sample]=scanbam(alnfname, amplicons,rq_chr)
+else:
+	sys.exit(0)
 
 
 #
