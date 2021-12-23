@@ -37,9 +37,7 @@ amplicon_nfo={ }
 
 assert os.path.isfile(args.amp), f"cannot find amplicon file yaml file {args.yaml}"
 with open(args.amp, 'rt') as yf:
-	import numpy as np
-	amp_str = yaml.load(yf, Loader=yaml.Loader)
-	#amp_str = yaml.safe_load(yf)
+	amp_str = yaml.safe_load(yf)
 
 amplicon_nfo = {
 		a: ','.join([

@@ -274,8 +274,8 @@ def filter_decode_vartiant(yam, categories=['mut','extra','shared','subset']):
 amplicons = { }
 if args.inamp is not None:
 	with open(args.inamp, 'rt') as yf:
-		# TODO type: force convert into numpy
-		amplicons=yaml.safe_load(yf)
+		# type: force convert into numpy
+		amplicons={ a: [np.uint32(p) for p in q[:4]]+[{np.uint32(p): m for p,m in q[4].items()}] for a,q in yaml.safe_load(yf).items()}
 
 else:
 	# load bedfile
@@ -320,9 +320,9 @@ else:
 			amplicons.update(amp_dict)
 
 	if args.outamp:
-		# TODO type: force convert into standard YAML and python types
 		with open(args.outamp, 'wt') as yf:
-			print(yaml.dump(amplicons, sort_keys=False), file=yf)
+			# type: force convert numpy numeric into standard YAML and python integers
+			print(yaml.dump({ a: [int(p) for p in q[:4]]+[{int(p): m for p,m in q[4].items()}] for a,q in amplicons.items()}, sort_keys=False), file=yf)
 
 
 
