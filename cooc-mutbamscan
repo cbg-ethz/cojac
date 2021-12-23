@@ -321,8 +321,20 @@ else:
 
 	if args.outamp:
 		with open(args.outamp, 'wt') as yf:
+			# wrapper that force either flow style or block style
+			class blockmap( dict ): pass
+			def blockmap_rep(dumper, data):
+				return dumper.represent_mapping( u'tag:yaml.org,2002:map', data, flow_style=False )
+
+			class flowseq( list ): pass
+			def flowseq_rep(dumper, data):
+				return dumper.represent_sequence( u'tag:yaml.org,2002:seq', data, flow_style=True )
+
+			yaml.add_representer(blockmap, blockmap_rep)
+			yaml.add_representer(flowseq, flowseq_rep)
+
 			# type: force convert numpy numeric into standard YAML and python integers
-			print(yaml.dump({ a: [int(p) for p in q[:4]]+[{int(p): m for p,m in q[4].items()}] for a,q in amplicons.items()}, sort_keys=False), file=yf)
+			print(yaml.dump(blockmap({ a: flowseq([int(p) for p in q[:4]]+[{int(p): m for p,m in q[4].items()}]) for a,q in amplicons.items()}), sort_keys=False), file=yf)
 
 
 
