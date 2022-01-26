@@ -206,7 +206,10 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name="", cooc=2):
 			tmp_mut_dict[t_df.iloc[j]["position"]] = t_df.iloc[j]["mutation"]
 
 		if len(tmp_mut_dict) >= mincoocthresh:
-			amplicons_dict["{}_{}".format(i+1, voc_name)] = [start, end, qstart, qstop, tmp_mut_dict]
+			# sort so that definitions with same mutations in different categories all yield identic result
+			# (e.g.: YAML definitions with either "{mut:{123:A,567:C}}" or "{mut:{567:C},extra:{123:A}}"  or "{mut:{123:A},extra:{567:C}}"
+			# will all always consistently yield a tmp_mut_dict with "{123:A,567:C}" )
+			amplicons_dict["{}_{}".format(i+1, voc_name)] = [start, end, qstart, qstop, dict(sorted(tmp_mut_dict.items()))]
 
 	return amplicons_dict
 
@@ -268,7 +271,10 @@ def filter_decode_vartiant(yam, categories=['mut','extra','shared','subset']):
 
 	return {
 		'name': yam['variant']['short'],
-		'mut':  { pos:mut_decode(mut) for c in categories if c in yam for(pos,mut) in yam[c].items() if mut_decode(mut) },
+		# sort so that definitions with same mutations in different categories all yield identic result
+		# (e.g.: YAML definitions with either "{mut:{123:A,567:C}}" or "{mut:{567:C},extra:{123:A}}"  or "{mut:{123:A},extra:{567:C}}"
+		# will all always consistently yield a tmp_mut_dict with "{123:A,567:C}" )
+		'mut':  dict(sorted((pos,mut_decode(mut)) for c in categories if c in yam for(pos,mut) in yam[c].items() if mut_decode(mut))),
 	 }
 
 amplicons = { }
@@ -311,7 +317,10 @@ else:
 			if d in amplicons.values():
 				k2=list(amplicons.keys())[list(amplicons.values()).index(d)]
 				print(f"{k1} is identical to {k2}")
-				amplicons['_'.join([k2, yam["name"]])]=amplicons.pop(k2)
+				npart = k2.split("_") + [yam["name"]]
+				# sort the variant names part of the list, to be consistent between calls, no matter the filesystem's on-disk order
+				# (i.e.: no 76_AY42_IN2 vs 76_IN2_AY42)
+				amplicons['_'.join([npart[0]] + sorted(npart[1:]))]=amplicons.pop(k2)
 				del amp_dict[k1]
 				break
 
