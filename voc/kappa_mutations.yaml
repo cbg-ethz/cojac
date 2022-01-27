@@ -2,7 +2,7 @@ variant:
   voc: 'VUI-21APR-01'
   who: 'kappa'
   pheuid: 'habitable-pasty'
-  short: 'IN1'
+  short: 'ka'
   pangolin: 'B.1.617.1'
   nextstrain: '21B'
 source:

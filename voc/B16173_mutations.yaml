@@ -1,7 +1,7 @@
 variant:
   voc: 'VUI-21APR-03'
   pheuid: 'spherical-trial'
-  short: 'IN3'
+  short: 'B16173'
   pangolin: 'B.1.617.3'
 source:
 - https://github.com/cov-lineages/pango-designation/issues/49
