@@ -47,7 +47,8 @@ extra:
   #11287: '---------'
   # S
   21765: '------'
-  21969: '---------'
+  #21969: '---------'
+  21987: '---------'
 
 #shared:  
   # Statistically frequent, but not part of an official signature
