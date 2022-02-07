@@ -92,8 +92,12 @@ def parse_args():
 		action="store_true", dest='domuts', help="always do mutations (even if amplicons YAML provided)")
 	argparser.add_argument('-H', '--high', required=False, default=0.80,
 		type=float, dest='high', help="Fraction above which a mutation must be found among seeked lineages")
-	argparser.add_argument('-l', '--low', required=False, default=0.05,
+	argparser.add_argument('-l', '--low', required=False, default=0.20,
 		type=float, dest='low', help="Fraction under which a mutation must be found among other lineages")
+	argparser.add_argument('--collapse', required=False, default=True,
+		action="store_true", dest='collapse', help="combine counts of all sublineages together and consider a signle value that corresponds to a lineages family (e.g.: count all B.1.612.2* together). This is especially useful for assessing signature of old variants that have branched out by now.")
+	argparser.add_argument('--no-collapse', required=False, default=True,
+		action="store_false", dest='collapse', help="consider each sublineage separately (e.g.: count separately BA.1, BA.1.1, BA.2, BA.3, etc. instead of counting B.1.529*)")
 	argparser.add_argument('-c', '--ansi', '--colour', required=False, default=True,
 		action="store_true", dest='ansi', help="use coloured output")
 	argparser.add_argument('-C', '--no-ansi', '--no-colour', required=False, default=True,
@@ -144,6 +148,19 @@ def mutsinlineages(*mutations):
 #
 # Compute useful stuff
 #
+
+def collapse(vardict, sublineages, combinedname=None):
+	"""collapse multiple sublineages into a combined one
+	e.g. BA.1 + BA.1.1 + BA.2 + BA.3 ... => B.1.529/omicron
+	"""
+	if combinedname is None:
+		combinedname=sublineages[0]
+
+	combined={ v:c for v,c in vardict.items() if v not in sublineages }
+	combined[combinedname]=sum([ vardict[v] for v in sublineages ])
+
+	return combined
+
 def freqperlineage(mutations, lineages):
 	"""convert count of samples to fraction of samples by dividing mutations-carrying by total count
 	results are sorted by frequency"""
@@ -183,25 +200,34 @@ def rank(sublineages, freqs, limit=0.05):
 
 	return (lastsub,firstother,inrange)
 
-def curate_muts(alllin,sublineages,label,mutargs,low=0.05,high=0.80,ansi=False):
+def curate_muts(alllin,sublineages,label,mutargs,low=0.05,high=0.80,ansi=False,combined=None):
 	"""
 	make a currated list:
 	- label (printed on screen)
 	- mutargs: list of mutations to search for
 	- sublineages: lineage that they must be found in
 	- alllin: table with all lineage and their counts (used to compute fractions)
+	- combined:
+	  - None: use mutation prevalage list as-is
+	  - string: combine all counts of sublineages into a single entry called this way
 	"""
 	marker='\x1b[1;3;4m*' if ansi else '*'
 	endl='\x1b[0m' if ansi else ''
 
 	muts=mutsinlineages(*mutargs)
+	if combined is not None:
+		# group the counts of sublineages together into the main lineage
+		# e.g. combine counts of BA.1,BA.1.1,BA.2,BA.3,etc. => B.1.1.529*
+		muts=collapse(muts, sublineages, combined)
+		su={combined}
+	else:
+		su=set(sublineages)
 	#print(muts)
 	freqs=freqperlineage(muts, alllin)
 	#print(freqs)
-	(s,o,r)=rank(sublineages,freqs,limit=low)
+	(s,o,r)=rank(su,freqs,limit=low)
 	#print(s,o,r)
 
-	su=set(sublineages)
 	fi=[i for i in freqs.items()]
 	#print({p:fi[p-1] for p in [s,o,r]})
 
@@ -252,6 +278,15 @@ def main():
 			'sublineages': sublineages,
 		}
 		common_kwargs.update(const_kwargs)
+		if len(sublineages) > 1 and args.collapse:
+			# do not use the common list of all lineage, instead collapse those who are part of the current considered variant into a single category
+			# e.g. combine counts of BA.1,BA.1.1,BA.2,BA.3,etc. => B.1.1.529*
+			combinedname=f"{lineage}*"
+			common_kwargs['alllin']=collapse(alllin, sublineages, combinedname)
+			common_kwargs['combined']=f"{lineage}*"
+		else:
+			common_kwargs['combined']=None
+
 		# mutations
 		if args.domuts or amplicons is None:
 			print("\nmutations:")
