@@ -1,0 +1,12 @@
+notebooks/.ipynb_checkpoints/
+notebooks/working
+notebooks/ww_plants.tsv
+notebooks/mutlist.txt
+notebooks/snv_tables/
+notebooks/tallymut_line_snv.tsv
+notebooks/tallymut_line.tsv
+notebooks/viollier_data.csv
+notebooks/data_per_city.csv
+notebooks/data_per_day_and_canton2.csv
+notebooks/ww_update_data.json
+

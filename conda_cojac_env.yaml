@@ -1,11 +1,13 @@
 name: cojac
 channels:
-  - defaults
   - conda-forge
   - bioconda
+  - defaults
 dependencies:
-  - pysam
-  - python 
+  - pysam >= 0.17
+  - python
   - pandas
   - numpy
   - pyyaml
+  - strictyaml
+  - requests
