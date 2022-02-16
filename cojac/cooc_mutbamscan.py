@@ -533,6 +533,7 @@ def write_all_amplicons(amplicons, outamp):
 @click.option(
     "-y",
     "--yaml",
+    "yaml_fname",
     metavar="YAML",
     required=False,
     default=None,
@@ -566,7 +567,7 @@ def cooc_mutbamscan(
     inamp,
     outamp,
     json_fname,
-    yaml,
+    yaml_fname,
     tsv,
     dump,
 ):
@@ -612,13 +613,13 @@ def cooc_mutbamscan(
     #
     # dumps, for being able to take it from here
     #
-    if (dump) or (not (json_fname or yaml)):
+    if (dump) or (not (json_fname or yaml_fname)):
         print(table)
     if json_fname:
         with open(json_fname, "wt") as jf:
             json.dump(obj=table, fp=jf)
-    if yaml:
-        with open(yaml, "wt") as yf:
+    if yaml_fname:
+        with open(yaml_fname, "wt") as yf:
             print(yaml.dump(table, sort_keys=False), file=yf)
 
     # raw data into pands.DataFrame
