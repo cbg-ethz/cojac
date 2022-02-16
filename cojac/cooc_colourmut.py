@@ -8,7 +8,8 @@ import click
 
 
 @click.command(
-    help="print coloured pretty table on terminal. See cooc-pubmut for a CSV file that can be imported into an article"
+    help="Print coloured pretty table on terminal",
+    epilog="See cooc-pubmut for a CSV file that can be imported into an article",
 )
 @click.option(
     "-a",

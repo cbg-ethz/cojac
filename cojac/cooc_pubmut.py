@@ -14,7 +14,8 @@ import click
 
 
 @click.command(
-    help="make a pretty table. You need to open the CSV in a spreadsheet that understands linebreaks"
+    help="Make a pretty table",
+    epilog="You need to open the CSV in a spreadsheet that understands linebreaks",
 )
 @click.option(
     "-m",

@@ -250,7 +250,8 @@ def curate_muts(
 
 
 @click.command(
-    help="helps determining specific mutations and cooccurences by querying CoV-Spectrum. This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/"
+    help="Helps determining specific mutations and cooccurences by querying CoV-Spectrum",
+    epilog="This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/",
 )
 @click.option(
     "-a",

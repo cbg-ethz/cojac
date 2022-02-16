@@ -430,7 +430,8 @@ def write_all_amplicons(amplicons, outamp):
 
 
 @click.command(
-    help="scan amplicon (covered by long read pairs) for mutation cooccurrence. @listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line"
+    help="Scan amplicon (covered by long read pairs) for mutation cooccurrence",
+    epilog="@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line",
 )
 @click.option(
     "-s",

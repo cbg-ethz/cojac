@@ -13,7 +13,7 @@ import gzip
 import click
 
 
-@click.command(help="make a table suitable for further processing: RStudio, etc.")
+@click.command(help="Make a table suitable for further processing: RStudio, etc")
 # TODO: create mutually exclusive options
 @click.option(
     "-j",
