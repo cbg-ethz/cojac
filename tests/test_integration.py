@@ -40,3 +40,42 @@ def test_workflow():
 
     # check frequencies
     subprocess.run(["cojac", "cooc-curate", "omicron_ba2_mutations.yaml"])
+
+    # amplicon queries
+    subprocess.run(
+        [
+            "cojac",
+            "cooc-mutbamscan"
+            "-b"
+            "nCoV-2019.insert.V3.bed"
+            "-m"
+            "voc/"
+            "-A"
+            "amplicons.v3.yaml",
+        ]
+    )
+    subprocess.run(
+        [
+            "cojac",
+            "cooc-curate",
+            "-a",
+            "amplicons.v3.yaml",
+            "voc/omicron_ba2_mutations.yaml",
+            "voc/omicron_ba1_mutations.yaml",
+            "voc/delta_mutations.yaml",
+        ]
+    )
+    subprocess.run(
+        [
+            "cojac",
+            "cooc-mutbamscan",
+            "-Q",
+            "amplicons.v3.yaml",
+            "-a",
+            "sam1.bam",
+            "-a",
+            "sam2.bam",
+            "-j",
+            "cooc-test.json",
+        ]
+    )

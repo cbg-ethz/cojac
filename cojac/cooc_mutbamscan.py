@@ -4,178 +4,13 @@ import pandas as pd
 import sys
 import os
 import re
-import argparse
 import csv
 import json
 import yaml
 import gzip
 import pysam
 
-
-# parse command line
-def parse_args():
-    """Set up the parsing of command-line arguments"""
-
-    argparser = argparse.ArgumentParser(
-        fromfile_prefix_chars="@",  # support pass BAM list in file instead of parameters
-        description="scan amplicon (covered by long read pairs) for mutation cooccurrence",
-        epilog="@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line",
-    )
-    inputgroup = argparser.add_mutually_exclusive_group(required=False)
-    inputgroup.add_argument(
-        "-s",
-        "--samples",
-        metavar="TSV",
-        type=str,
-        dest="samples",
-        help="V-pipe samples list tsv",
-    )
-    inputgroup.add_argument(
-        "-a",
-        "--alignments",
-        metavar="BAM/CRAM",
-        nargs="+",
-        dest="alignments",
-        help="alignment files",
-    )
-    argparser.add_argument(
-        "-/",
-        "--batchname",
-        nargs="?",
-        const="/",
-        default=None,
-        dest="batchname",
-        help="concatenate samplename/batchname from samples tsv",
-    )
-    argparser.add_argument(
-        "-p",
-        "--prefix",
-        metavar="PATH",
-        required=False,
-        default="working/samples",
-        type=str,
-        dest="prefix",
-        help="V-pipe work directory prefix for where to look at align files when using TSV samples list",
-    )
-    argparser.add_argument(
-        "-r",
-        "--reference",
-        metavar="REFID",
-        required=False,
-        default=None,  # default='NC_045512.2',
-        type=str,
-        dest="rq_chr",
-        help="reference to look for in alignment files",
-    )
-    argparser.add_argument(
-        "-m",
-        "--vocdir",
-        metavar="DIR",
-        required=False,
-        default="./voc",
-        type=str,
-        dest="vocdir",
-        help="directory containing the yamls defining the variant of concerns",
-    )
-    argparser.add_argument(
-        "-b",
-        "--bedfile",
-        metavar="BED",
-        required=False,
-        default="./nCoV-2019.insert.V3.bed",
-        type=str,
-        dest="bedfile",
-        help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand",
-    )
-    argparser.add_argument(
-        "-#",
-        "--cooc",
-        metavar="COOC",
-        required=False,
-        default=2,
-        type=int,
-        dest="cooc",
-        help="minimum number of cooccurences to search for",
-    )
-    ampgroup = argparser.add_mutually_exclusive_group(required=False)
-    ampgroup.add_argument(
-        "-Q",
-        "--in-amp",
-        "--amplicons",
-        metavar="YAML",
-        required=False,
-        default=None,
-        type=str,
-        dest="inamp",
-        help="use the supplied YAML file to query amplicons instead of building it from BED + voc's DIR",
-    )
-    ampgroup.add_argument(
-        "-A",
-        "--out-amp",
-        "--out-amplicons",
-        metavar="YAML",
-        required=False,
-        default=None,
-        type=str,
-        dest="outamp",
-        help="output amplicon query in a YAML file",
-    )
-    argparser.add_argument(
-        "-j",
-        "--json",
-        metavar="JSON",
-        required=False,
-        default=None,
-        type=str,
-        dest="json",
-        help="output results to as JSON file",
-    )
-    argparser.add_argument(
-        "-y",
-        "--yaml",
-        metavar="YAML",
-        required=False,
-        default=None,
-        type=str,
-        dest="yaml",
-        help="output results to as yaml file",
-    )
-    argparser.add_argument(
-        "-t",
-        "--tsv",
-        metavar="TSV",
-        required=False,
-        default=None,
-        type=str,
-        dest="tsv",
-        help="output results to as (raw) tsv file",
-    )
-    argparser.add_argument(
-        "-d",
-        "--dump",
-        action="store_true",
-        dest="dump",
-        help="dump the python object to the terminal",
-    )
-    args = argparser.parse_args()
-
-    if args.inamp is not None:
-        assert os.path.isfile(
-            args.inamp
-        ), f"cannot find amplicons yaml file {args.inamp}"
-
-    if args.samples is not None:
-        assert os.path.isfile(args.samples), f"cannot find sample file {args.samples}"
-    elif args.alignments is not None:
-        for align in args.alignments:
-            assert os.path.isfile(align), f"cannot find alginment file {align}"
-    elif not args.outamp:
-        print(
-            "at least one of --alignements --samples or --out-amplicons need to be specified"
-        )
-        sys.exit(2)
-
-    return args
+import click
 
 
 def test_read(read, mut_dict):
@@ -594,43 +429,180 @@ def write_all_amplicons(amplicons, outamp):
         )
 
 
-def main():
-    # parse args
-    args = parse_args()
-
+@click.command(
+    help="scan amplicon (covered by long read pairs) for mutation cooccurrence. @listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line"
+)
+@click.option(
+    "-s",
+    "--samples",
+    metavar="TSV",
+    type=str,
+    help="V-pipe samples list tsv",
+)
+@click.option(
+    "-a",
+    "--alignments",
+    metavar="BAM/CRAM",
+    multiple=True,
+    help="alignment files",
+)
+@click.option(
+    "-/",
+    "--batchname",
+    multiple=True,
+    default=None,
+    help="concatenate samplename/batchname from samples tsv",
+)
+@click.option(
+    "-p",
+    "--prefix",
+    metavar="PATH",
+    required=False,
+    default="working/samples",
+    type=str,
+    help="V-pipe work directory prefix for where to look at align files when using TSV samples list",
+)
+@click.option(
+    "-r",
+    "--reference",
+    "rq_chr",
+    metavar="REFID",
+    required=False,
+    default=None,  # default='NC_045512.2',
+    type=str,
+    help="reference to look for in alignment files",
+)
+@click.option(
+    "-m",
+    "--vocdir",
+    metavar="DIR",
+    required=False,
+    default="./voc",
+    type=str,
+    help="directory containing the yamls defining the variant of concerns",
+)
+@click.option(
+    "-b",
+    "--bedfile",
+    metavar="BED",
+    required=False,
+    default="./nCoV-2019.insert.V3.bed",
+    type=str,
+    help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand",
+)
+@click.option(
+    "-#",
+    "--cooc",
+    metavar="COOC",
+    required=False,
+    default=2,
+    type=int,
+    help="minimum number of cooccurences to search for",
+)
+# TODO: use mutually exclusive groups
+@click.option(
+    "-Q",
+    "--in-amplicons",
+    "inamp",
+    metavar="YAML",
+    required=False,
+    default=None,
+    type=str,
+    help="use the supplied YAML file to query amplicons instead of building it from BED + voc's DIR",
+)
+@click.option(
+    "-A",
+    "--out-amplicons",
+    "outamp",
+    metavar="YAML",
+    required=False,
+    default=None,
+    type=str,
+    help="output amplicon query in a YAML file",
+)
+@click.option(
+    "-j",
+    "--json",
+    "json_fname",
+    metavar="JSON",
+    required=False,
+    default=None,
+    type=str,
+    help="output results to as JSON file",
+)
+@click.option(
+    "-y",
+    "--yaml",
+    metavar="YAML",
+    required=False,
+    default=None,
+    type=str,
+    help="output results to as yaml file",
+)
+@click.option(
+    "-t",
+    "--tsv",
+    metavar="TSV",
+    required=False,
+    default=None,
+    type=str,
+    help="output results to as (raw) tsv file",
+)
+@click.option(
+    "-d",
+    "--dump",
+    is_flag=True,
+    help="dump the python object to the terminal",
+)
+def cooc_mutbamscan(
+    samples,
+    alignments,
+    batchname,
+    prefix,
+    rq_chr,
+    vocdir,
+    bedfile,
+    cooc,
+    inamp,
+    outamp,
+    json_fname,
+    yaml,
+    tsv,
+    dump,
+):
     # amplicons that will be searched
     amplicons = {}
-    if args.inamp is not None:
+    if inamp is not None:
         # load pre-computed amplicons
-        amplicons = load_all_amplicons(args.inamp)
+        amplicons = load_all_amplicons(inamp)
     else:
         # compute amplicons
-        amplicons = make_all_amplicons(args.bedfile, args.vocdir, args.cooc)
+        amplicons = make_all_amplicons(bedfile, vocdir, cooc)
         # and save them for future reference
-        if args.outamp:
-            write_all_amplicons(amplicons, args.outamp)
+        if outamp:
+            write_all_amplicons(amplicons, outamp)
 
-    rq_chr = args.rq_chr  # e.g.: 'NC_045512.2'
+    rq_chr = rq_chr  # e.g.: 'NC_045512.2'
 
     # loop for if samples are given through the TSV list
     table = {}
-    if args.samples is not None:
+    if samples is not None:
         i = 0
         with open(
-            args.samples, "rt", encoding="utf-8", newline=""
+            samples, "rt", encoding="utf-8", newline=""
         ) as tf:  # this file has the same content as the original experiment
             for r in csv.reader(tf, delimiter="\t"):  # dialect='excel-tab'):
                 sample, batch = r[:2]
                 print(sample)
-                alnfname = findbam(args.prefix, batch, sample)
-                table[
-                    f"{sample}{args.batchname}{batch}" if args.batchname else sample
-                ] = scanbam(alnfname, amplicons, rq_chr)
+                alnfname = findbam(prefix, batch, sample)
+                table[f"{sample}{batchname}{batch}" if batchname else sample] = scanbam(
+                    alnfname, amplicons, rq_chr
+                )
 
     # loop for if samples are given through -a option
     # this option can also de used to dispatch per sample jobx on the cluster
-    elif args.alignments is not None:
-        for alnfname in args.alignments:
+    elif alignments is not None:
+        for alnfname in alignments:
             sample = alnfname  # HACK use the whole BAM file as sample name
             table[sample] = scanbam(alnfname, amplicons, rq_chr)
     else:
@@ -640,17 +612,17 @@ def main():
     #
     # dumps, for being able to take it from here
     #
-    if (args.dump) or (not (args.json or args.yaml)):
+    if (dump) or (not (json_fname or yaml)):
         print(table)
-    if args.json:
-        with open(args.json, "wt") as jf:
+    if json_fname:
+        with open(json_fname, "wt") as jf:
             json.dump(obj=table, fp=jf)
-    if args.yaml:
-        with open(args.yaml, "wt") as yf:
+    if yaml:
+        with open(yaml, "wt") as yf:
             print(yaml.dump(table, sort_keys=False), file=yf)
 
     # raw data into pands.DataFrame
-    if args.tsv:
+    if tsv:
         raw_table_df = pd.DataFrame.from_dict(
             data={
                 i: {(j, k): table[i][j][k] for j in table[i] for k in table[i][j]}
@@ -660,8 +632,8 @@ def main():
         )
         # with pd.option_context('display.max_rows', None): #, 'display.max_columns', None):
         # print(raw_table_df)
-        raw_table_df.to_csv(args.tsv, sep="\t", compression={"method": "infer"})
+        raw_table_df.to_csv(tsv, sep="\t", compression={"method": "infer"})
 
 
 if __name__ == "__main__":
-    main()
+    cooc_mutbamscan()
