@@ -16,7 +16,7 @@ def test_workflow():
         print(name)
         subprocess.run(["wget", "--no-clobber", "-O", name, url])
 
-    subprocess.run(
+    subprocess.check_call(
         [
             "wget",
             "--no-clobber",
@@ -26,7 +26,7 @@ def test_workflow():
 
     # retrieve variants
     # TODO: mock network access
-    subprocess.run(
+    subprocess.check_call(
         [
             "cojac",
             "phe2cojac",
@@ -39,10 +39,10 @@ def test_workflow():
     )
 
     # check frequencies
-    subprocess.run(["cojac", "cooc-curate", "omicron_ba2_mutations.yaml"])
+    subprocess.check_call(["cojac", "cooc-curate", "omicron_ba2_mutations.yaml"])
 
     # amplicon queries
-    subprocess.run(
+    subprocess.check_call(
         [
             "cojac",
             "cooc-mutbamscan",
@@ -54,7 +54,7 @@ def test_workflow():
             "amplicons.v3.yaml",
         ]
     )
-    subprocess.run(
+    subprocess.check_call(
         [
             "cojac",
             "cooc-curate",
@@ -65,7 +65,7 @@ def test_workflow():
             "voc/delta_mutations.yaml",
         ]
     )
-    subprocess.run(
+    subprocess.check_call(
         [
             "cojac",
             "cooc-mutbamscan",
@@ -81,6 +81,6 @@ def test_workflow():
     )
 
     # display results
-    subprocess.run(
+    subprocess.check_call(
         ["cojac", "cooc-colourmut", "-a", "amplicons.v3.yaml", "-j", "cooc-test.json"]
     )
