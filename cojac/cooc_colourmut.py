@@ -11,6 +11,15 @@ def main():
         description="print coloured pretty table on terminal",
         epilog="see cooc-pubmut for a CSV file that can be imported into an article",
     )
+    argparser.add_argument(
+        "-a",
+        "--amplicons",
+        metavar="YAML",
+        required=True,
+        type=str,
+        dest="amp",
+        help="list of query amplicons, from mutbamscan",
+    )
     inputgroup = argparser.add_mutually_exclusive_group(required=True)
     inputgroup.add_argument(
         "-j",
@@ -38,27 +47,33 @@ def main():
         with open(args.json, "rt") as jf:
             table = json.load(fp=jf)
     elif args.yaml:
-        assert os.path.isfile(args.yaml), f"cannot find result json file {args.yaml}"
+        assert os.path.isfile(args.yaml), f"cannot find result yaml file {args.yaml}"
         with open(args.yaml, "rt") as yf:
             table = yaml.safe_load(yf)
 
     assert len(table) > 0, "cannot succesfully load table"
 
-    # TODO generate instead of hardcodind
+    # reuse stored amplicons
+    amplicon_nfo = {}
+
+    assert os.path.isfile(args.amp), f"cannot find amplicon file yaml file {args.amp}"
+    with open(args.amp, "rt") as yf:
+        amp_str = yaml.safe_load(yf)
 
     amplicon_nfo = {
-        "76_IN1_IN3": "22917G,23012:C",
-        "76_IN2": "22917G,22995A",
-        "91_IN2": "27638C,27752T",
-        "72_UK": "21765-21770Δ,21991-21993Δ",
-        "78_UK": "23604A,23709T",
-        "92_UK": "27972T,28048T,28111G",
-        "93_UK": "28111G,28280-28280->CTA",
-        "95_BR": "28877T,28878C",
-        "71_BR": "21621A,21638T,21614T",
-        "73_ZA": "22206G,22299T",
-        "76_BR_ZA": "23012A,23063T",
-        "77_EU": "23403G",
+        a: ",".join(
+            [
+                f"{p}{b}"
+                if len(b) == 1
+                else (
+                    f"\u0394{p}-{p + len(b) - 1}"
+                    if b == "-" * len(b)
+                    else f"{p}\u2192{b}"
+                )
+                for p, b in aqu[4].items()
+            ]
+        )
+        for a, aqu in amp_str.items()
     }
 
     #
@@ -69,9 +84,11 @@ def main():
     print(f"{'':<{l}} ", end="")
     for a in amplicon_nfo:
         print(f" {a :<26}", end="")
-    print(f"\n{'':<{l}} ", end="")
+    print(f"\n{'':<{l}}  ", end="")
     for a, label in amplicon_nfo.items():
-        print(f" {label :<26}", end="")
+        print(
+            f"{label if len(label)<=27 else (label[:26]+chr(0x2026)) :<27.27}", end=""
+        )
     print(f"\n{'sample:':<{l}} ", end="")
     for a in amplicon_nfo:
         print(f"{'cov:' :>9}{'mut:' :>9}{'frq/%:' :>9}", end="")

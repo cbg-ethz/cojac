@@ -17,6 +17,26 @@ def main():
         description="make a pretty table",
         epilog="you need to open the CSV in a spreadsheet that understands linebreaks",
     )
+    argparser.add_argument(
+        "-m",
+        "--vocdir",
+        metavar="DIR",
+        required=False,
+        default=None,
+        type=str,
+        dest="vocdir",
+        help="directory containing the yamls defining the variant of concerns",
+    )
+    argparser.add_argument(
+        "-a",
+        "--amplicons",
+        metavar="YAML",
+        required=False,
+        default=None,
+        type=str,
+        dest="amp",
+        help="list of query amplicons, from mutbamscan",
+    )
     inputgroup = argparser.add_mutually_exclusive_group(required=True)
     inputgroup.add_argument(
         "-j",
@@ -79,6 +99,68 @@ def main():
     )
     args = argparser.parse_args()
 
+    # TODO make the "header prettification" code more generic and share with colourmut
+
+    # load variants
+    variants_names = {}
+    if args.vocdir is not None:
+        for path in [p for p in os.listdir(args.vocdir) if not p.startswith(".")]:
+            full_path = os.path.join(args.vocdir, path)
+            with open(full_path, "r") as yf:
+                loaded_yaml = yaml.load(yf, Loader=yaml.FullLoader)["variant"]
+            nameparts = []
+            # lineage name
+            if "pangolin" in loaded_yaml:
+                nameparts += [loaded_yaml["pangolin"]]
+            elif "nextstrain" in loaded_yaml:
+                nameparts += [loaded_yaml["nextstrain"]]
+            # WHO greek letter
+            if "who" in loaded_yaml:
+                nameparts += [f"({loaded_yaml['who']})"]
+            # assemble, e.g. "B.1.529 (omicron)"
+            variants_names[loaded_yaml["short"]] = " ".join(nameparts)
+        # print(variants_names)
+
+    # load amplicons
+    amplicon_nfo = {}
+    if args.amp is not None:
+        assert os.path.isfile(
+            args.amp
+        ), f"cannot find amplicon file yaml file {args.amp}"
+        with open(args.amp, "rt") as yf:
+            amp_str = yaml.safe_load(yf)
+
+        amplicon_nfo = {
+            a: "\n".join(
+                [
+                    # amplicon number
+                    f"Amplicon {a.split('_')[0]}",
+                    # genomic position span
+                    f"[{aqu[0]}-{aqu[1]}]",
+                    "",
+                    # Variants
+                    ",".join([variants_names.get(v, v) for v in a.split("_")[1:]]),
+                    "",
+                    # Mutations
+                    # TODO incorporate output of curate
+                    ",".join(
+                        [
+                            f"{p}{b}"
+                            if len(b) == 1
+                            else (
+                                f"\u0394{p}-{p + len(b) - 1}"
+                                if b == "-" * len(b)
+                                else f"{p}\u2192{b}"
+                            )
+                            for p, b in aqu[4].items()
+                        ]
+                    ),
+                ]
+            )
+            for a, aqu in amp_str.items()
+        }
+        # print(amplicon_nfo)
+
     # load table
     table = {}
 
@@ -130,7 +212,9 @@ def main():
             # pack into dict for pandas
             df_dict[ksam].update(
                 {
-                    ampname: f"{muts_cnt} / {sites_cnt}{args.escape[0]}{f'{100*float(muts_cnt)/float(sites_cnt) :.2f}%' if sites_cnt else 'NA'}"
+                    amplicon_nfo.get(
+                        ampname, ampname
+                    ): f"{muts_cnt} / {sites_cnt}{args.escape[0]}{f'{100*float(muts_cnt)/float(sites_cnt) :.2f}%' if sites_cnt else 'NA'}"
                 }
             )
 

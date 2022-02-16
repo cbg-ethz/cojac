@@ -2,12 +2,12 @@ variant:
   voc: 'VOC-21APR-02'
   who: 'delta'
   pheuid: 'empathy-serve'
-  short: 'IN2'
+  short: 'de'
   pangolin: 'B.1.617.2'
   nextstrain: '21A'
 source:
 - https://github.com/cov-lineages/pango-designation/issues/49
-threshold: 5
+threshold: 4
 mut:
   # S
   21618: 'C>G' # surface glycoprotein:T19R
