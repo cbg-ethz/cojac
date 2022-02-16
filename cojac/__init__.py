@@ -1,5 +1,5 @@
 from .main import cli
-from .cooc_colourmut import main as cooc_colourmut
+from .cooc_colourmut import cooc_colourmut
 from .cooc_curate import cooc_curate
 from .cooc_mutbamscan import cooc_mutbamscan
 from .cooc_pubmut import main as cooc_pubmut

@@ -79,3 +79,8 @@ def test_workflow():
             "cooc-test.json",
         ]
     )
+
+    # display results
+    subprocess.run(
+        ["cojac", "cooc-colourmut", "-a", "amplicons.v3.yaml", "-j", "cooc-test.json"]
+    )
