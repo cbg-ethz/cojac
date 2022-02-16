@@ -138,7 +138,7 @@ def mutsinlineages(*mutations):
 #
 
 
-def collapse(vardict, sublineages, combinedname=None):
+def collapse_sublineages(vardict, sublineages, combinedname=None):
     """collapse multiple sublineages into a combined one
     e.g. BA.1 + BA.1.1 + BA.2 + BA.3 ... => B.1.529/omicron
     """
@@ -214,7 +214,7 @@ def curate_muts(
     if combined is not None:
         # group the counts of sublineages together into the main lineage
         # e.g. combine counts of BA.1,BA.1.1,BA.2,BA.3,etc. => B.1.1.529*
-        muts = collapse(muts, sublineages, combined)
+        muts = collapse_sublineages(muts, sublineages, combined)
         su = {combined}
     else:
         su = set(sublineages)
@@ -335,7 +335,9 @@ def cooc_curate(amp, domuts, high, low, collapse, colour, voc):
             # do not use the common list of all lineage, instead collapse those who are part of the current considered variant into a single category
             # e.g. combine counts of BA.1,BA.1.1,BA.2,BA.3,etc. => B.1.1.529*
             combinedname = f"{lineage}*"
-            common_kwargs["alllin"] = collapse(alllin, sublineages, combinedname)
+            common_kwargs["alllin"] = collapse_sublineages(
+                alllin, sublineages, combinedname
+            )
             common_kwargs["combined"] = f"{lineage}*"
         else:
             common_kwargs["combined"] = None
