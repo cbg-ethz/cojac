@@ -15,138 +15,140 @@ The analysis requires the whole amplicon to be covered by sequencing read pairs.
 
 Here are the available command-line tools:
 
-| command                              | purpose |
-| :----------------------------------- | :------ |
-| [`cooc-mutbamscan`](cooc-mutbamscan) | scan an alignment BAM/CRAM/SAM file for mutation co-occurrences and output a JSON or YAML file |
-| [`cooc-colourmut`](cooc-colourmut)   | display a JSON or YAML file as a coloured output on the terminal |
-| [`cooc-pubmut`](cooc-pubmut)         | render a JSON or YAML file to a table as in the publication |
-| [`cooc-tabmut`](cooc-tabmut)         | export a JSON or YAML file as a CSV/TSV table for downstream analysis (e.g.: RStudio) |
-| [`cooc-curate`](cooc-curate)         | an (experimental) tool to assist evaluating the quality of variant definitions by looking at mutations' or cooccurences' frequencies from [CoV-Spectrum](cov-spectrum.ethz.ch) |
-| [`phe2cojac`](phe2cojac)             | a tool to generate new variant definition YAMLs for cojac using YMLs available at [PHE Genomic's _Standardised Variant Definitions_](https://github.com/phe-genomics/variant_definitions) |
+| command                                    | purpose |
+| :----------------------------------------- | :------ |
+| [`cojac cooc-mutbamscan`](cooc-mutbamscan) | scan an alignment BAM/CRAM/SAM file for mutation co-occurrences and output a JSON or YAML file |
+| [`cojac cooc-colourmut`](cooc-colourmut)   | display a JSON or YAML file as a coloured output on the terminal |
+| [`cojac cooc-pubmut`](cooc-pubmut)         | render a JSON or YAML file to a table as in the publication |
+| [`cojac cooc-tabmut`](cooc-tabmut)         | export a JSON or YAML file as a CSV/TSV table for downstream analysis (e.g.: RStudio) |
+| [`cojac cooc-curate`](cooc-curate)         | an (experimental) tool to assist evaluating the quality of variant definitions by looking at mutations' or cooccurences' frequencies from [CoV-Spectrum](cov-spectrum.ethz.ch) |
+| [`cojac phe2cojac`](phe2cojac)             | a tool to generate new variant definition YAMLs for cojac using YMLs available at [PHE Genomic's _Standardised Variant Definitions_](https://github.com/phe-genomics/variant_definitions) |
 
 Use option `-h` / `--help` to see available command-line options:
 
 ```console
-$ cooc-mutbamscan --help
-usage: cooc-mutbamscan [-h] [-s TSV | -a BAM/CRAM [BAM/CRAM ...]] [-/ [BATCHNAME]] [-p PATH] [-r REFID] [-m DIR] [-b BED] [-# COOC] [-Q YAML | -A YAML] [-j JSON] [-y YAML] [-t TSV] [-d]
+$ cojac cooc-mutbamscan --help
+Usage: cojac cooc-mutbamscan [OPTIONS]
 
-scan amplicon (covered by long read pairs) for mutation cooccurrence
+  Scan amplicon (covered by long read pairs) for mutation cooccurrence
 
-options:
-  -h, --help            show this help message and exit
-  -s TSV, --samples TSV
-                        V-pipe samples list tsv
-  -a BAM/CRAM [BAM/CRAM ...], --alignments BAM/CRAM [BAM/CRAM ...]
-                        alignment files
-  -/ [BATCHNAME], --batchname [BATCHNAME]
-                        concatenate samplename/batchname from samples tsv
-  -p PATH, --prefix PATH
-                        V-pipe work directory prefix for where to look at align files when using TSV samples list
-  -r REFID, --reference REFID
-                        reference to look for in alignment files
-  -m DIR, --vocdir DIR  directory containing the yamls defining the variant of concerns
-  -b BED, --bedfile BED
-                        bedfile defining the amplicons, with format: ref\tstart\tstop\tamp_num\tpool\tstrand
-  -# COOC, --cooc COOC  minimum number of cooccurences to search for
-  -Q YAML, --in-amp YAML, --amplicons YAML
-                        use the supplied YAML file to query amplicons instead of building it from BED + voc's DIR
-  -A YAML, --out-amp YAML, --out-amplicons YAML
-                        output amplicon query in a YAML file
-  -j JSON, --json JSON  output results to as JSON file
-  -y YAML, --yaml YAML  output results to as yaml file
-  -t TSV, --tsv TSV     output results to as (raw) tsv file
-  -d, --dump            dump the python object to the terminal
+Options:
+  -s, --samples TSV          V-pipe samples list tsv
+  -a, --alignments BAM/CRAM  alignment files
+  -, --batchname TEXT        concatenate samplename/batchname from samples tsv
+  -p, --prefix PATH          V-pipe work directory prefix for where to look at
+                             align files when using TSV samples list
+  -r, --reference REFID      reference to look for in alignment files
+  -m, --vocdir DIR           directory containing the yamls defining the
+                             variant of concerns
+  -b, --bedfile BED          bedfile defining the amplicons, with format:
+                             ref\tstart\tstop\tamp_num\tpool\tstrand
+  -#, --cooc COOC            minimum number of cooccurences to search for
+  -Q, --in-amplicons YAML    use the supplied YAML file to query amplicons
+                             instead of building it from BED + voc's DIR
+  -A, --out-amplicons YAML   output amplicon query in a YAML file
+  -j, --json JSON            output results to as JSON file
+  -y, --yaml YAML            output results to as yaml file
+  -t, --tsv TSV              output results to as (raw) tsv file
+  -d, --dump                 dump the python object to the terminal
+  --help                     Show this message and exit.
 
-@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line
+  @listfile can be used to pass a long list of parameters (e.g.: a large
+  number of BAMs) in a file instead of command line
 ```
 
 ```console
-$ cooc-colourmut --help
-usage: cooc-colourmut [-h] -a YAML (-j JSON | -y YAML)
+$ cojac cooc-colourmut --help
+Usage: cojac cooc-colourmut [OPTIONS]
 
-print coloured pretty table on terminal
+  Print coloured pretty table on terminal
 
-options:
-  -h, --help            show this help message and exit
-  -a YAML, --amplicons YAML
-                        list of query amplicons, from mutbamscan
-  -j JSON, --json JSON  results generated by mutbamscan
-  -y YAML, --yaml YAML  results generated by mutbamscan
+Options:
+  -a, --amplicons YAML  list of query amplicons, from mutbamscan  [required]
+  -j, --json JSON       results generated by mutbamscan
+  -y, --yaml YAML       results generated by mutbamscan
+  --help                Show this message and exit.
 
-see cooc-pubmut for a CSV file that can be imported into an article
+  See cooc-pubmut for a CSV file that can be imported into an article
 ```
 
 ```console
-$ cooc-pubmut --help
-usage: cooc-pubmut [-h] [-m DIR] [-a YAML] (-j JSON | -y YAML) [-o CSV] [-e | -x] [-/ [BATCHNAME]] [-q]
+$ cojac cooc-pubmut --help
+Usage: cojac cooc-pubmut [OPTIONS]
 
-make a pretty table
+  Make a pretty table
 
-options:
-  -h, --help            show this help message and exit
-  -m DIR, --vocdir DIR  directory containing the yamls defining the variant of concerns
-  -a YAML, --amplicons YAML
-                        list of query amplicons, from mutbamscan
-  -j JSON, --json JSON  results generated by mutbamscan
-  -y YAML, --yaml YAML  results generated by mutbamscan
-  -o CSV, --output CSV  name of (pretty) csv file to save the table into
-  -e, --escape          use escape characters for newlines
-  -x, --excel           use a semi-colon ';' instead of a comma ',' in the comma-separated-files as required by Microsoft Excel
-  -/ [BATCHNAME], --batchname [BATCHNAME]
-                        split samplename/batchname (as in samples tsv)
-  -q, --quiet           Run quietly: do not print the table
+Options:
+  -m, --vocdir DIR        directory containing the yamls defining the variant
+                          of concerns
+  -a, --amplicons YAML    list of query amplicons, from mutbamscan
+  -j, --json JSON         results generated by mutbamscan
+  -y, --yaml YAML         results generated by mutbamscan
+  -o, --output CSV        name of (pretty) csv file to save the table into
+  -e, --escape            use escape characters for newlines
+  -e, --escape            use escape characters for newlines
+  -x, --excel             use a semi-colon ';' instead of a comma ',' in the
+                          comma-separated-files as required by Microsoft Excel
+  -, --batchname BOOLEAN  split samplename/batchname (as in samples tsv)
+  -, --batchname          split samplename/batchname (as in samples tsv)
+  -q, --quiet             Run quietly: do not print the table
+  --help                  Show this message and exit.
 
-you need to open the CSV in a spreadsheet that understands linebreaks
+  You need to open the CSV in a spreadsheet that understands linebreaks
 ```
 
 ```console
-$ cooc-tabmut --help
-usage: cooc-tabmut [-h] (-j JSON | -y YAML) [-/ [BATCHNAME]] [-o CSV] [-l] [-x] [-m] [-q]
+$ cojac cooc-tabmut --help
+Usage: cojac cooc-tabmut [OPTIONS]
 
-make a table suitable for further processing: RStudio, etc.
+  Make a table suitable for further processing: RStudio, etc
 
-options:
-  -h, --help            show this help message and exit
-  -j JSON, --json JSON  results generated by mutbamscan
-  -y YAML, --yaml YAML  results generated by mutbamscan
-  -/ [BATCHNAME], --batchname [BATCHNAME]
-                        split samplename/batchname (as in samples tsv)
-  -o CSV, --output CSV  name of (pretty) csv file to save the table into
-  -l, --lines           Line-oriented table alternative
-  -x, --excel           use a semi-colon ';' instead of a comma ',' in the comma-separated-files as required by Microsoft Excel
-  -m, --multiindex      Use multi-level indexing (amplicons and counts categories)
-  -q, --quiet           Run quietly: do not print the table
+Options:
+  -j, --json JSON         results generated by mutbamscan
+  -y, --yaml YAML         results generated by mutbamscan
+  -, --batchname BOOLEAN  split samplename/batchname (as in samples tsv)
+  -, --batchname          split samplename/batchname (as in samples tsv)
+  -o, --output CSV        name of (pretty) csv file to save the table into
+  -l, --lines             Line-oriented table alternative
+  -x, --excel             use a semi-colon ';' instead of a comma ',' in the
+                          comma-separated-files as required by Microsoft Excel
+  -m, --multiindex        Use multi-level indexing (amplicons and counts
+                          categories)
+  -q, --quiet             Run quietly: do not print the table
+  --help                  Show this message and exit.
 ```
 
 ```console
-$ cooc-curate --help
-usage: cooc-curate [-h] [-a YAML] [-m] [-H HIGH] [-l LOW] [--collapse] [--no-collapse] [-c] [-C] VOC [VOC ...]
+$ cojac cooc-curate --help
+Usage: cojac cooc-curate [OPTIONS] [VOC]...
 
-helps determining specific mutations and cooccurences by querying CoV-Spectrum
+  Helps determining specific mutations and cooccurences by querying CoV-
+  Spectrum
 
-positional arguments:
-  VOC                   per VOC description YAML file(s)
+Options:
+  -a, --amplicons YAML        use the YAML file generated by mutbamscan to
+                              query amplicons instead of mutations
+  -m, --mutations             always do mutations (even if amplicons YAML
+                              provided)
+  -H, --high FLOAT            Fraction above which a mutation must be found
+                              among seeked lineages
+  -l, --low FLOAT             Fraction under which a mutation must be found
+                              among other lineages
+  --collapse / --no-collapse  combine counts of all sublineages together and
+                              consider a signle value that corresponds to a
+                              lineages family (e.g.: count all B.1.612.2*
+                              together). This is especially useful for
+                              assessing signature of old variants that have
+                              branched out by now.
+  --colour / --no-colour      use coloured output
+  --help                      Show this message and exit.
 
-options:
-  -h, --help            show this help message and exit
-  -a YAML, --amp YAML, --amplicons YAML
-                        use the YAML file generated by mutbamscan to query amplicons instead of mutations
-  -m, --mut, --mutations
-                        always do mutations (even if amplicons YAML provided)
-  -H HIGH, --high HIGH  Fraction above which a mutation must be found among seeked lineages
-  -l LOW, --low LOW     Fraction under which a mutation must be found among other lineages
-  --collapse            combine counts of all sublineages together and consider a signle value that corresponds to a lineages family (e.g.: count all B.1.612.2* together). This is especially useful for assessing signature of old
-                        variants that have branched out by now.
-  --no-collapse         consider each sublineage separately (e.g.: count separately BA.1, BA.1.1, BA.2, BA.3, etc. instead of counting B.1.529*)
-  -c, --ansi, --colour  use coloured output
-  -C, --no-ansi, --no-colour
-                        use text
-
-This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/
+  This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and
+  https://lapis.cov-spectrum.org/
 ```
 
 ```console
-$ phe2cojac  --help
+$ cojac phe2cojac  --help
 usage: phe2cojac [-h] [-s SHRT] [-y [OUT_YAML]] IN_YAML
 
 convert phe-genomics to cojac's dedicated variant YAML format
@@ -208,7 +210,7 @@ There are currently two modes to collect the data about co-occurring mutations i
 Provide a list of BAM files using the `-a` / `--alignment` option. Run:
 
 ```bash
-cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -a sam1.bam sam2.bam -j cooc-test.json
+cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -a sam1.bam sam2.bam -j cooc-test.json
 ```
 
 > **Note:** you can also use the `-y` / `--yaml` option to write to a YAML file instead of a JSON.
@@ -222,7 +224,7 @@ You can learn how to analyse _fastq.gz_ files with V-pipe with this tutorial:
 Run:
 
 ```bash
-cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -t work/samples.tsv -p work/samples/ -j cooc-test.json
+cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -t work/samples.tsv -p work/samples/ -j cooc-test.json
 ```
 
 #### Number of cooccurences
@@ -239,13 +241,13 @@ You can then re-use the exact same request using the `-Q` / `--in-amp` / `--ampl
 
 ```bash
 # store the request in a YAML file
-cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -A amplicons.v3.yaml
+cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -A amplicons.v3.yaml
 # adjust the content of amplicons.v3.yaml
 
 # now have a look at the frequencies of mutation cooccurences using CoV-Spectrum
-cooc-curate -a amplicons.v3.yaml voc/omicron_ba2_mutations.yaml voc/omicron_ba1_mutations.yaml voc/delta_mutations.yaml
+cojac cooc-curate -a amplicons.v3.yaml voc/omicron_ba2_mutations.yaml voc/omicron_ba1_mutations.yaml voc/delta_mutations.yaml
 # reuse the amplicon
-cooc-mutbamscan -Q amplicons.v3.yaml -a sam1.bam sam2.bam -j cooc-test.json
+cojac cooc-mutbamscan -Q amplicons.v3.yaml -a sam1.bam sam2.bam -j cooc-test.json
 ```
 
 ### Display data on terminal
@@ -253,7 +255,7 @@ cooc-mutbamscan -Q amplicons.v3.yaml -a sam1.bam sam2.bam -j cooc-test.json
 The default `-d` / `--dump` option of `cooc-mutbamscan` is not a very user-friendly experience to display the data. You can instead pass a JSON or YAML file to the display script. Run:
 
 ```bash
-cooc-colourmut -a amplicons.v3.yaml -j cooc-test.json
+cojac cooc-colourmut -a amplicons.v3.yaml -j cooc-test.json
 ```
 
 ![terminal screen shot](images/terminal.svg)
@@ -266,7 +268,7 @@ cooc-colourmut -a amplicons.v3.yaml -j cooc-test.json
 And now, let’s go beyond our terminal and produce a table that can be included in a publication (see bibliography below for concrete example). Run:
 
 ```bash
-cooc-pubmut -m voc/ -a amplicons.v3.yaml -j cooc-test.json -o cooc-output.tsv
+cojac cooc-pubmut -m voc/ -a amplicons.v3.yaml -j cooc-test.json -o cooc-output.tsv
 ```
 
 > **Note:**
@@ -285,7 +287,7 @@ You need to open the table with a spread-sheet that can understand line breaks, 
 It is also possible to use the software [_pandoc_](https://pandoc.org/) to further convert the CSV to other formats. Run:
 
 ```bash
-cooc-pubmut -j cooc-test.json -o cooc-output.csv
+cojac cooc-pubmut -j cooc-test.json -o cooc-output.csv
 pandoc cooc-output.csv -o cooc-output.pdf
 pandoc cooc-output.csv -o cooc-output.html
 pandoc cooc-output.csv -o cooc-output.md
@@ -296,7 +298,7 @@ pandoc cooc-output.csv -o cooc-output.md
 If you want to further analyse the data (e.g.: with RStudio), it's also possible to export the data into a more machine-readable CSV/TSV table. Run:
 
 ```bash
-./cooc-pubmut -j cooc-test.json -o cooc-export.csv
+cojac cooc-tabmut -j cooc-test.json -o cooc-export.csv
 ```
 
 You can try importing the resulting CSV in you favourite tool.
@@ -308,15 +310,15 @@ You can try importing the resulting CSV in you favourite tool.
 
 The columns are tagged as following:
 
- - **count**: total count of amplicons carrying the sites of interest 
+ - **count**: total count of amplicons carrying the sites of interest
  - **mut_all**: amplicons carrying mutations on all site of interest (e.g.: variant mutations observed on all sites)
  - **mut_oneless**: amplicons where one mutation is missing (e.g.: only 2 out of 3 sites carried the variant mutation, 1 sites carries wild-type)
  - **frac**: fraction _(mut_all/count)_ or empty if no _counts_
  - **cooc**: number of considered site (e.g.: 2 sites of interests) or empty if no _counts_
- 
+
 If your tool supports multi-level indexing, use the `-m`/`--multiindex` option. The resulting table will be bilevel indexed:
 the first level is the amplicon, the second is the category.
- 
+
 <table>
 <thead>
 <tr><th></th><th colspan="5">A72_al</th><th colspan="5">A78_al</th></tr>
@@ -399,7 +401,7 @@ We recommend using conda to install them:
 conda env create -f conda_cojac_env.yaml
 conda activate cojac
 # now run from the cojac directory
-./cooc-mutbamscan --help
+cojac cooc-mutbamscan --help
 ```
 
 _cojac_ itself doesn't have a specific installer (yet) but you can copy its executables in your _PATH_ (so you can call them without specifying their location), e.g.: into the conda environment:
@@ -407,8 +409,7 @@ _cojac_ itself doesn't have a specific installer (yet) but you can copy its exec
 ```bash
 # activate the environment if not already active:
 conda activate cojac
-cp cooc-* ${CONDA_PREFIX}/bin/
-cooc-mutbamscan --help
+cojac cooc-mutbamscan --help
 ```
 
 ### Remove conda environment
@@ -421,6 +422,14 @@ conda deactivate
 conda env remove -n cojac
 ```
 
+### Python Package Index
+
+Alternatively, you can install `cojac` using pip:
+
+```bash
+pip install cojac
+```
+
 ## Additional notebooks
 
 The subdirectory [`notebooks/`](notebooks/) contains Jupyter and Rstudio notebooks used in the [publication](#citation).
@@ -431,7 +440,7 @@ The subdirectory [`notebooks/`](notebooks/) contains Jupyter and Rstudio noteboo
 - [x] ~~further jupyter and rstudio code from the publication~~
 - [x] ~~Move hard-coded amplicons to BED input file~~
 - [x] ~~Move hard-coded mutations to YAML configuration~~
-- [ ] Refactor code into proper Python package
+- [x] Refactor code into proper Python package
 
 Long term goal:
 
@@ -443,6 +452,7 @@ Long term goal:
 #### Package developers:
 
 - [David Dreifuss ![orcid]](https://orcid.org/0000-0002-5827-5387), [![github]](https://github.com/dr-david)
+- [Kim Philipp Jablonski ![orcid]](https://orcid.org/0000-0002-4166-4343), [![github]](https://github.com/kpj)
 - [Ivan Topolsky ![orcid]](https://orcid.org/0000-0002-7561-0810), [![github]](https://github.com/dryak)
 
 #### Additional notebooks:
@@ -450,7 +460,6 @@ Long term goal:
  - [Lara Fuhrmann ![orcid]](https://orcid.org/0000-0001-6405-0654), [![github]](https://github.com/LaraFuhrmann)
  - [Kim Philipp Jablonski ![orcid]](https://orcid.org/0000-0002-4166-4343), [![github]](https://github.com/kpj)
  - [Katharina Jahn ![orcid]](https://orcid.org/0000-0002-6983-4615), [![github]](https://github.com/jahnka)
- - [Kim Philipp Jablonski ![orcid]](https://orcid.org/0000-0002-4166-4343), [![github]](https://github.com/kpj)
 
 #### Corresponding author:
 
