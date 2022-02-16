@@ -10,7 +10,7 @@ import argparse
 import click
 
 
-@click.command()
+@click.command(help="convert phe-genomics to cojac's dedicated variant YAML format")
 @click.option(
     "-s",
     "--shortname",

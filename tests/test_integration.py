@@ -25,6 +25,7 @@ def test_workflow():
     )
 
     # retrieve variants
+    # TODO: mock network access
     subprocess.run(
         [
             "cojac",
