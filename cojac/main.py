@@ -5,7 +5,7 @@ from .cooc_curate import main as cooc_curate
 from .cooc_mutbamscan import main as cooc_mutbamscan_script
 from .cooc_pubmut import main as cooc_pubmut_script
 from .cooc_tabmut import main as cooc_tabmut_script
-from .phe2cojac import main as phe2cojac_script
+from .phe2cojac import phe2cojac
 
 
 @click.group()
@@ -39,6 +39,4 @@ def cooc_tabmut():
     cooc_tabmut_script()
 
 
-@cli.command()
-def phe2cojac():
-    phe2cojac_script()
+cli.add_command(phe2cojac)

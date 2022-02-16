@@ -7,49 +7,34 @@ import yaml
 import strictyaml
 import argparse
 
+import click
 
-def main():
-    argparser = argparse.ArgumentParser(
-        description="convert phe-genomics to cojac's dedicated variant YAML format"
-    )
-    argparser.add_argument(
-        "-s",
-        "--shortname",
-        metavar="SHRT",
-        required=False,
-        default=None,
-        type=str,
-        dest="shortname",
-        help="shortname to use (otherwise auto-build one based on phe-genomic's unique id)",
-    )
-    argparser.add_argument(
-        "-y",
-        "--yaml",
-        metavar="OUT_YAML",
-        nargs="?",
-        const="",
-        required=False,
-        default=None,
-        type=str,
-        dest="outname",
-        help="write cojac variant to a YAML file instead of printing (if empty, build filename from shortname)",
-    )
-    argparser.add_argument(
-        "fname",
-        metavar="IN_YAML",
-        nargs=1,
-        default=None,
-        type=str,
-        help="phe-genomics variant YAML input file",
-    )
-    args = argparser.parse_args()
-
-    fname = args.fname[
-        0
-    ]  # e.g.: 'variant_definitions/variant_yaml/habitable-pasty.yml'
-    short = args.shortname  # either None or e.g.: IN
-    outname = args.outname  # None: don't write, '' use shortname or 'filename'
-
+@click.command()
+@click.option(
+    "-s",
+    "--shortname",
+    metavar="SHRT",
+    required=False,
+    default=None,
+    type=str,
+    help="shortname to use (otherwise auto-build one based on phe-genomic's unique id)",
+)
+@click.option(
+    "-y",
+    "--yaml",
+    "outname",
+    metavar="OUT_YAML",
+    required=False,
+    default=None,
+    type=str,
+    help="write cojac variant to a YAML file instead of printing (if empty, build filename from shortname)",
+)
+@click.argument(
+    "fname",
+    metavar="IN_YAML",
+    type=str,
+)
+def phe2cojac(shortname, outname, fname):
     # phe-genomics input
     with open(fname, "r") as yf:
         yam = strictyaml.dirty_load(yf.read(), allow_flow_style=True).data
@@ -66,7 +51,7 @@ def main():
     rxshortify = re.compile("^([a-z]{2})[^-]*-([a-z]{2})")
 
     outy["variant"]["short"] = (
-        short if short else "".join(rxshortify.search(yam["unique-id"]).group(1, 2))
+        shortname if shortname else "".join(rxshortify.search(yam["unique-id"]).group(1, 2))
     )
 
     for bl in yam["belongs-to-lineage"]:
@@ -170,4 +155,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    phe2cojac()
