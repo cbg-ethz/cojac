@@ -45,12 +45,12 @@ def test_workflow():
     subprocess.run(
         [
             "cojac",
-            "cooc-mutbamscan"
-            "-b"
-            "nCoV-2019.insert.V3.bed"
-            "-m"
-            "voc/"
-            "-A"
+            "cooc-mutbamscan",
+            "-b",
+            "nCoV-2019.insert.V3.bed",
+            "-m",
+            "voc/",
+            "-A",
             "amplicons.v3.yaml",
         ]
     )
