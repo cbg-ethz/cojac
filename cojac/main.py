@@ -1,7 +1,7 @@
 import click
 
 from .cooc_colourmut import main as cooc_colourmut_script
-from .cooc_curate import main as cooc_curate
+from .cooc_curate import cooc_curate
 from .cooc_mutbamscan import main as cooc_mutbamscan_script
 from .cooc_pubmut import main as cooc_pubmut_script
 from .cooc_tabmut import main as cooc_tabmut_script
@@ -20,11 +20,6 @@ def cooc_colourmut():
 
 
 @cli.command()
-def cooc_curate():
-    cooc_curate_script()
-
-
-@cli.command()
 def cooc_mutbamscan():
     cooc_mutbamscan_script()
 
@@ -39,4 +34,5 @@ def cooc_tabmut():
     cooc_tabmut_script()
 
 
+cli.add_command(cooc_curate)
 cli.add_command(phe2cojac)

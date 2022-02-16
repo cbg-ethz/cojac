@@ -5,7 +5,6 @@ import io
 import re
 import yaml
 import strictyaml
-import argparse
 
 import click
 

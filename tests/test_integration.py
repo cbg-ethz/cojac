@@ -37,3 +37,6 @@ def test_workflow():
             "imagines-viewable.yml",
         ]
     )
+
+    # check frequencies
+    subprocess.run(["cojac", "cooc-curate", "omicron_ba2_mutations.yaml"])
