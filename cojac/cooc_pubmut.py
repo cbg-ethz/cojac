@@ -83,6 +83,7 @@ import click
     "--excel",
     "semi",
     is_flag=True,
+    default=False,
     help="use a semi-colon ';' instead of a comma ',' in the comma-separated-files as required by Microsoft Excel",
 )
 @click.option(
