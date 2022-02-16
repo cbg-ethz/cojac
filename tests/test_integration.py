@@ -85,7 +85,7 @@ def test_workflow():
         ["cojac", "cooc-colourmut", "-a", "amplicons.v3.yaml", "-j", "cooc-test.json"]
     )
 
-    # create result tsv
+    # create result tsv and csv
     subprocess.check_call(
         [
             "cojac",
@@ -99,4 +99,7 @@ def test_workflow():
             "-o",
             "cooc-output.tsv",
         ]
+    )
+    subprocess.check_call(
+        ["cojac", "cooc-tabmut", "-j", "cooc-test.json", "-o", "cooc-export.csv"]
     )
