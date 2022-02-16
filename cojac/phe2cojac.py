@@ -9,6 +9,7 @@ import argparse
 
 import click
 
+
 @click.command()
 @click.option(
     "-s",
@@ -51,7 +52,9 @@ def phe2cojac(shortname, outname, fname):
     rxshortify = re.compile("^([a-z]{2})[^-]*-([a-z]{2})")
 
     outy["variant"]["short"] = (
-        shortname if shortname else "".join(rxshortify.search(yam["unique-id"]).group(1, 2))
+        shortname
+        if shortname
+        else "".join(rxshortify.search(yam["unique-id"]).group(1, 2))
     )
 
     for bl in yam["belongs-to-lineage"]:

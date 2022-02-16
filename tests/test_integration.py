@@ -14,20 +14,25 @@ def test_workflow():
     for url in data_sources:
         name = url.split("=")[-1]
         print(name)
-        subprocess.run([
+        subprocess.run(["wget", "--no-clobber", "-O", name, url])
+
+    subprocess.run(
+        [
             "wget",
             "--no-clobber",
-            "-O", name,
-            url
-        ])
-
-    subprocess.run([
-        "wget",
-        "--no-clobber",
-        "https://raw.githubusercontent.com/phe-genomics/variant_definitions/main/variant_yaml/imagines-viewable.yml"
-    ])
+            "https://raw.githubusercontent.com/phe-genomics/variant_definitions/main/variant_yaml/imagines-viewable.yml",
+        ]
+    )
 
     # retrieve variants
-    subprocess.run([
-        "cojac", "phe2cojac", "--shortname", 'om2', "--yaml", "omicron_ba2_mutations.yaml", "imagines-viewable.yml"
-    ])
+    subprocess.run(
+        [
+            "cojac",
+            "phe2cojac",
+            "--shortname",
+            "om2",
+            "--yaml",
+            "omicron_ba2_mutations.yaml",
+            "imagines-viewable.yml",
+        ]
+    )
