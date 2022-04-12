@@ -1,0 +1,25 @@
+name: rpy2
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - rpy2=2.9.4
+  - seaborn
+  - statsmodels
+  - natsort
+  - pandas>=1 # supports > 1 ndim Categorical
+  #- pandas=0.25.3 # for pandas.DataFrame.from_items, but "> 1 ndim Categorical are not supported at this time"
+  - scipy
+  - matplotlib
+  - numpy
+  - ipykernel
+  - tzlocal
+  - simplegeneric
+  - r-mass
+  - typing_extensions
+# don't forget to run:
+# ```
+# conda activate rpy2
+# python -m ipykernel install --user --name=rpy2
+# ```
+

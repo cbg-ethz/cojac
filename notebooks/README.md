@@ -23,3 +23,15 @@ We lose some confidence by only using a single windows per SVN, but because _var
 ## mut-table.ipynb
 
 Combines a list of SNV from the precedent Notebook with a reads counts, so we can also estimate mutation frequency.
+
+## ww_smoothing.ipynb
+
+Produce smoothed curves of B.1.1.7 frequency for wastewater and clinical samples.
+
+## ww_modelling.ipynb
+
+Produce fitted logistic growth curves of B.1.1.7 frequency for wastewater and clinical samples. Produce online estimates of fitness advantage.
+
+## ww_delta.ipynb
+
+Produce plots of Delta prevalence in clinical samples and cojac detections in wastewater.
