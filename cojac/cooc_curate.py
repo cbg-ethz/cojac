@@ -100,6 +100,23 @@ def filter_decode_vartiant(yam, categories=["mut", "extra", "shared", "subset"])
 server = "https://cov-spectrum.ethz.ch/gisaid/api/v1"
 
 
+def nucmutations(**kwargs):
+    """use the 'nuc-mutation' LAPIS call to get
+    - optionnally filtered (filter parameters such as 'pangoLineage')
+    - list of mutation, frequencies and sample counts (for all frequencies > 0.05 )
+    """
+    # TODO proper error handling
+    return json.loads(requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text)[
+        "data"
+    ]
+
+
+def listmutations(lineage):
+    """list all mutation for a specific lineage (either the variant it self or one of its sub-variants)"""
+    return nucmutations(pangoLineage=(lineage + "*"))
+
+
+
 def aggregated(**kwargs):
     """use the 'aggregated' LAPIS call to get
     - optionnally categorized ('fields' parameters)
@@ -136,6 +153,10 @@ def mutsinlineages(*mutations):
 #
 # Compute useful stuff
 #
+
+
+def listfilteredmutations(lineage, minfreq=0.8, minseqs=100):
+    return set(m["mutation"] for m in listmutations(lineage) if m["proportion"] > minfreq and m["count"] > minseqs)
 
 
 def collapse_sublineages(vardict, sublineages, combinedname=None):
