@@ -1,7 +1,7 @@
 variant:
   voc: VOC-21NOV-01
   pheuid: pentagon-refining
-  short: om1
+  short: BA1
   pangolin: BA.1
 source:
 - https://github.com/cov-lineages/pango-designation/issues/343

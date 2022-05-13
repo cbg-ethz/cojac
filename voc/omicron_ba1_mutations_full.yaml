@@ -1,0 +1,72 @@
+variant:
+  short: 'om1'
+  nextstrain: '21K'
+  pangolin: 'BA.1'
+source:
+- https://github.com/cov-lineages/pango-designation/issues/361
+- https://github.com/hodcroftlab/covariants/blob/master/defining_mutations/21K.Omicron.tsv
+mut:
+  2832: 'A>G' # ORF1a:K856R 
+  6513: '---' # ORF1a:d2083-2084
+  5386: 'T>G' #  
+  8393: 'G>A' # ORF1a:A2710T 
+  11288: '-----'  # see below:
+  #actually, due to repeated 'T's flanking the region, can be any of these:
+  #11284: '---------' # SGF3675del
+  #11287: '---------' # SGF3675del
+  11537: 'A>G' # ORF1a:I3758V 
+  13195: 'T>C' # only found in phe-gnomic's pentagon-refining
+  15240: 'C>T' #  
+  21762: 'C>T' # S:A67V  
+  21765: '------'
+  21846: 'C>T' # S:T95I  
+  21987: '---------' # S:d142-144
+  #"T21994-"
+  21995: '-' # S:d145
+  22205: '+GAGCCAGAA' # 215EPEins
+  22194: '---' # S:d211-212
+  22673: 'TCC>CTC' # surface glycoprotein:S371L
+  22898: 'G>A' # S:G446S 
+  23048: 'G>A' # S:G496S 
+  23202: 'C>A' # S:T547K 
+  24130: 'C>A' # S:N856K 
+  24503: 'C>T' # S:L981F 
+  26530: 'A>G' # M:D3G 
+shared:
+  241: 'C>T' #  
+  3037: 'C>T' #  
+  10029: 'C>T' # ORF1a:T3255I 
+  10449: 'C>A' # ORF1a:P3395H 
+  14408: 'C>T' # ORF1b:P314L 
+  18163: 'A>G' # ORF1b:I1566V 
+  22578: 'G>A' # S:G339D 
+  22679: 'T>C' # S:S373P 
+  22686: 'C>T' # S:S375F 
+  22813: 'G>T' # S:K417N 
+  22882: 'T>G' # S:N440K 
+  22992: 'G>A' # S:S477N 
+  22995: 'C>A' # S:T478K 
+  23013: 'A>C' # S:E484A 
+  23040: 'A>G' # S:Q493R 
+  23055: 'A>G' # S:Q498R 
+  23063: 'A>T' # S:N501Y 
+  23075: 'T>C' # S:Y505H 
+  23403: 'A>G' # S:D614G 
+  23525: 'C>T' # S:H655Y 
+  23599: 'T>G' # S:N679K 
+  23604: 'C>A' # S:P681H 
+  23854: 'C>A' # S:N764K 
+  23948: 'G>T' # S:D796Y 
+  24424: 'A>T' # S:Q954H 
+  24469: 'T>A' # S:N969K 
+  25000: 'C>T' #  
+  25584: 'C>T' #  
+  26270: 'C>T' # E:T9I 
+  26577: 'C>G' # M:Q19E 
+  26709: 'G>A' # M:A63T 
+  27259: 'A>C' #  
+  27807: 'C>T' #  
+  28271: 'A>T' #  
+  28311: 'C>T' # N:P13L ORF9b:P10S
+  28362: '---------' # N:d31-33 ORF9b:d27-29
+  28881: 'GGG>AAC' # N:RG203KR

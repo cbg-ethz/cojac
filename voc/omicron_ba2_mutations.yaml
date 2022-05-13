@@ -1,7 +1,7 @@
 variant:
   voc: VUI-22JAN-01
   pheuid: imagines-viewable
-  short: om2
+  short: BA2
   pangolin: BA.2
 source:
 - https://github.com/cov-lineages/pango-designation/issues/361

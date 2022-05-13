@@ -1,0 +1,81 @@
+variant:
+  short: 'om2'
+  nextstrain: '21L'
+  pangolin: 'BA.2'
+source:
+- https://github.com/cov-lineages/pango-designation/issues/361
+- https://github.com/hodcroftlab/covariants/blob/master/defining_mutations/21L.Omicron.tsv
+mut:
+  670: 'T>G' # ORF1a:S135R 
+  2790: 'C>T' # ORF1a:T842I 
+  4184: 'G>A' # ORF1a:G1307S 
+  4321: 'C>T' #  
+  9424: 'A>G' #  
+  9344: 'C>T' # ORF1a:L3027F 
+  9534: 'C>T' # ORF1a:T3090I 
+  10198: 'C>T' #  
+  10447: 'G>A' #  
+  11288: '-----'  # see below:
+  #actually, due to repeated 'T's flanking the region, can be any of these:
+  #11284: '---------' # SGF3675del
+  #11288: '---------' # SGF3675del
+  12880: 'C>T' #  
+  15714: 'C>T' #  
+  17410: 'C>T' # ORF1b:R1315C 
+  19955: 'C>T' # ORF1b:T2163I 
+  20055: 'A>G' #  
+  21618: 'C>T' # S:T19I 
+  21633: '---------' # S:d24-27
+  #21987: '---------' # VYY143del -- there is an outlier which has instead 21987:'G>A' # S:G142D ...
+  21987: 'G>A' # S:G142D ...but that outlier seems more frequent outisde of S Africa 
+  22200: 'T>G' # S:V213G 
+  22674: 'C>T' # S:S371F 
+  22688: 'A>G' # S:T376A 
+  22775: 'G>A' # S:D405N 
+  22786: 'A>C' # S:R408S - covariants and cov-spectrum
+  #22786: 'A>T' # R408S - table in issue 361
+  26060: 'C>T' # ORF3a:T223I 
+  26858: 'C>T' #  
+  27382: 'GAT>CTC' # ORF6:D61L 
+  29510: 'A>C' # N:S413R
+shared:
+  241: 'C>T' #  
+  3037: 'C>T' #  
+  9866: 'C>T' # ORF1a:L3201L   Outside of S Africa, (C9866T - ORF1a:L3201F) is common, but within S Africa it is not (Not in CERI-KRISP-K032307)
+  10029: 'C>T' # ORF1a:T3255I 
+  10449: 'C>A' # ORF1a:P3395H 
+  #13195: 'T>C' # syn nsp10
+  14408: 'C>T' # ORF1b:P314L 
+  18163: 'A>G' # ORF1b:I1566V 
+  22578: 'G>A' # S:G339D 
+  22679: 'T>C' # S:S373P 
+  22686: 'C>T' # S:S375F 
+  22813: 'G>T' # S:K417N 
+  22882: 'T>G' # S:N440K 
+  22992: 'G>A' # S:S477N 
+  22995: 'C>A' # S:T478K 
+  23013: 'A>C' # S:E484A 
+  23040: 'A>G' # S:Q493R 
+  23055: 'A>G' # S:Q498R 
+  23063: 'A>T' # S:N501Y 
+  23075: 'T>C' # S:Y505H 
+  23403: 'A>G' # S:D614G 
+  23525: 'C>T' # S:H655Y 
+  23599: 'T>G' # S:N679K 
+  23604: 'C>A' # S:P681H 
+  23854: 'C>A' # S:N764K 
+  23948: 'G>T' # S:D796Y 
+  24424: 'A>T' # S:Q954H 
+  24469: 'T>A' # S:N969K 
+  25000: 'C>T' #  
+  25584: 'C>T' #  
+  26270: 'C>T' # E:T9I 
+  26577: 'C>G' # M:Q19E 
+  26709: 'G>A' # M:A63T 
+  27259: 'A>C' #  
+  27807: 'C>T' #  
+  28271: 'A>T' #  
+  28311: 'C>T' # N:P13L ORF9b:P10S
+  28362: '---------' # N:d31-33 ORF9b:d27-29
+  28881: 'GGG>AAC' # N:RG203KR
+
