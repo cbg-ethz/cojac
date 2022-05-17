@@ -11,5 +11,5 @@ dependencies:
   - pyyaml
   - strictyaml
   - requests
-  - poetry
   - click
+  - poetry-core >= 1.0.8
