@@ -167,7 +167,7 @@ def collapse_sublineages(vardict, sublineages, combinedname=None):
         combinedname = sublineages[0]
 
     combined = {v: c for v, c in vardict.items() if v not in sublineages}
-    combined[combinedname] = sum([vardict[v] for v in sublineages])
+    combined[combinedname] = sum([vardict.get(v,0) for v in sublineages])
 
     return combined
 
