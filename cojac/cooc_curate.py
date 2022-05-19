@@ -106,15 +106,14 @@ def nucmutations(**kwargs):
     - list of mutation, frequencies and sample counts (for all frequencies > 0.05 )
     """
     # TODO proper error handling
-    return json.loads(requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text)[
-        "data"
-    ]
+    return json.loads(
+        requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text
+    )["data"]
 
 
 def listmutations(lineage):
     """list all mutation for a specific lineage (either the variant it self or one of its sub-variants)"""
     return nucmutations(pangoLineage=(lineage + "*"))
-
 
 
 def aggregated(**kwargs):
@@ -156,7 +155,11 @@ def mutsinlineages(*mutations):
 
 
 def listfilteredmutations(lineage, minfreq=0.8, minseqs=100):
-    return set(m["mutation"] for m in listmutations(lineage) if m["proportion"] > minfreq and m["count"] > minseqs)
+    return set(
+        m["mutation"]
+        for m in listmutations(lineage)
+        if m["proportion"] > minfreq and m["count"] > minseqs
+    )
 
 
 def collapse_sublineages(vardict, sublineages, combinedname=None):
@@ -167,7 +170,7 @@ def collapse_sublineages(vardict, sublineages, combinedname=None):
         combinedname = sublineages[0]
 
     combined = {v: c for v, c in vardict.items() if v not in sublineages}
-    combined[combinedname] = sum([vardict.get(v,0) for v in sublineages])
+    combined[combinedname] = sum([vardict.get(v, 0) for v in sublineages])
 
     return combined
 
