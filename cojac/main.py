@@ -6,7 +6,7 @@ from .cooc_mutbamscan import cooc_mutbamscan
 from .cooc_pubmut import cooc_pubmut
 from .cooc_tabmut import cooc_tabmut
 from .phe2cojac import phe2cojac
-
+from .sig_generate import sig_generate
 
 @click.group()
 def cli():
@@ -19,3 +19,4 @@ cli.add_command(cooc_mutbamscan)
 cli.add_command(cooc_pubmut)
 cli.add_command(cooc_tabmut)
 cli.add_command(phe2cojac)
+cli.add_command(sig_generate)
