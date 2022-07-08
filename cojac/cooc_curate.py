@@ -12,92 +12,30 @@ import yaml
 
 import click
 
-# TODO proper library instead of copy-pasta
-rxmutdec = re.compile(
-    "^(?:(?:(?:(?P<ref>[ATCG]+)\>)?(?P<mut>[ATCG]+))|(?P<del>[\-]+)|(?:[\+](?P<ins>[ATGC]+)))$"
-)
-
-
-def mut_decode(mutstr):
-    """function to decode the strings of a mutation
-    mutation can specifie:
-     - a single base (e.g.: 'C') or a run of bases ('CAT')
-     - a substitution (e.g.: 'G>C'), can also be longer ('GTC>CAT')
-     - a run of deletions ('---')
-     - an insertions ('+TATA')
-
-    (Basically, this function strips the reference part)
-
-    Input:
-            a string with any of the above
-    Returns:
-            a string with bases or deletions (either single or runs)
-    """
-
-    res = rxmutdec.match(mutstr)
-
-    if res:
-        match = res.groupdict()
-        if match["mut"]:
-            # print(f"{mutstr} : mutation {match['mut']}")
-            return match["mut"]
-        if match["del"]:
-            # print(f"{mutstr} : deletion {match['del']}")
-            return match["del"]
-        if match["ins"]:
-            print(f"insertions not supported (yet): {mutstr} : {match['ins']}")
-            return None
-    print(f"cannot parse mutation f{mutstr}")
-    sys.exit(1)
-
-
-def filter_decode_vartiant(yam, categories=["mut", "extra", "shared", "subset"]):
-    """function to filter mutations and decode the strings
-    mutations can be classified as:
-     - 'mut': defining mut
-     - 'extra': officially not counted as defining but still specific
-     - 'shared': present in this variant, but also occuring outside of it (e.g.: common ancestror)
-     - 'subset': only present on some variants (i.e.: 'not fixed')
-    mutation can be specifie:
-     - a single base (e.g.: 'C') or a run of bases ('CAT')
-     - a substitution (e.g.: 'G>C'), can also be longer ('GTC>CAT')
-     - a run of deletions ('---')
-     - an insertions ('+TATA')
-
-    Input:
-            yam: dictionnary loaded from a voc YAML
-            categories: a list of categories to filter-in
-    Returns:
-            voc: dict() with
-                    'name': short name of the variant
-                    'mut': a an ordereddict() of 'position': 'bases or deletions'
-    """
-
-    return {
-        "name": yam["variant"]["short"],
-        # sort so that definitions with same mutations in different categories all yield identic result
-        # (e.g.: YAML definitions with either "{mut:{123:A,567:C}}" or "{mut:{567:C},extra:{123:A}}"  or "{mut:{123:A},extra:{567:C}}"
-        # will all always consistently yield a tmp_mut_dict with "{123:A,567:C}" )
-        "mut": dict(
-            sorted(
-                (pos, mut_decode(mut))
-                for c in categories
-                if c in yam
-                for (pos, mut) in yam[c].items()
-                if mut_decode(mut)
-            )
-        ),
-    }
-
-
-# END of mutbamscan copy-pasta
+from .mut_parser import mut_decode, filter_decode_vartiant
 
 
 #
 # CoV-Spectrum pico-API
 #
 
+
 server = "https://cov-spectrum.ethz.ch/gisaid/api/v1"
+
+
+def getAccessKey():
+    # TODO proper global handling
+    try:
+        # we use ~/.netrc to obtain credentials
+        import netrc
+
+        return netrc.netrc().authenticators("cov-spectrum.ethz.ch")[2]
+    except:
+        print(
+            "no access key found for cov-spectrum.ethz.ch in ~/.netrc\n",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 def nucmutations(**kwargs):
@@ -105,15 +43,26 @@ def nucmutations(**kwargs):
     - optionnally filtered (filter parameters such as 'pangoLineage')
     - list of mutation, frequencies and sample counts (for all frequencies > 0.05 )
     """
-    # TODO proper error handling
-    return json.loads(
+    kwargs["accessKey"] = getAccessKey()
+    reply = json.loads(
         requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text
-    )["data"]
+    )
+
+    if reply["data"] is None:
+        # TODO prety-printing would help
+        print(reply)
+        # TODO replace with proper exception throwing in the future
+        sys.exit(1)
+
+    return reply["data"]
 
 
-def listmutations(lineage):
+def listmutations(lineage, extras={}):
     """list all mutation for a specific lineage (either the variant it self or one of its sub-variants)"""
-    return nucmutations(pangoLineage=(lineage + "*"))
+    if "variantQuery" in extras.keys():
+        # NOTE according to covspectrum: "Please specify the variant either by using the fields pangoLineage, nextstrainClade, gisaidClade, aaMutations and nucMutations, or by using variantQuery - don't use both at the same time."
+        return nucmutations(**extras)
+    return nucmutations(pangoLineage=(lineage + "*"), **extras)
 
 
 def aggregated(**kwargs):
@@ -121,10 +70,16 @@ def aggregated(**kwargs):
     - optionnally categorized ('fields' parameters)
     - count of samples that fit criteria (the other parameters)
     """
-    # TODO proper error handling
-    return json.loads(requests.get(f"{server}/sample/aggregated", params=kwargs).text)[
-        "data"
-    ]
+    kwargs["accessKey"] = getAccessKey()
+    reply = json.loads(requests.get(f"{server}/sample/aggregated", params=kwargs).text)
+
+    if reply["data"] is None:
+        # TODO prety-printing would help
+        print(reply)
+        # TODO replace with proper exception throwing in the future
+        sys.exit(1)
+
+    return reply["data"]
 
 
 def listsublineages(lineage):
@@ -154,10 +109,10 @@ def mutsinlineages(*mutations):
 #
 
 
-def listfilteredmutations(lineage, minfreq=0.8, minseqs=100):
+def listfilteredmutations(lineage, minfreq=0.8, minseqs=100, extras={}):
     return set(
         m["mutation"]
-        for m in listmutations(lineage)
+        for m in listmutations(lineage, extras)
         if m["proportion"] > minfreq and m["count"] > minseqs
     )
 

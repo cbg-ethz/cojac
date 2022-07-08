@@ -8,8 +8,10 @@ from .cooc_tabmut import cooc_tabmut
 from .phe2cojac import phe2cojac
 from .sig_generate import sig_generate
 
+
 @click.group()
 def cli():
+    #  auto_envvar_prefix='...' for fetching options (such as passwords) from environment.
     pass
 
 
