@@ -373,10 +373,11 @@ def write_all_amplicons(amplicons, outamp):
     help="alignment files",
 )
 @click.option(
-    "-/",
     "--batchname",
-    multiple=True,
+    metavar="SEP",
+    required=False,
     default=None,
+    type=str,
     help="concatenate samplename/batchname from samples tsv",
 )
 @click.option(
@@ -428,6 +429,8 @@ def write_all_amplicons(amplicons, outamp):
 # TODO: use mutually exclusive groups
 @click.option(
     "-Q",
+    "--amplicons",
+    "--in-amp",
     "--in-amplicons",
     "inamp",
     metavar="YAML",
@@ -438,6 +441,7 @@ def write_all_amplicons(amplicons, outamp):
 )
 @click.option(
     "-A",
+    "--out-amp",
     "--out-amplicons",
     "outamp",
     metavar="YAML",
