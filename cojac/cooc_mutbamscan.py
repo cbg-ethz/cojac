@@ -8,7 +8,8 @@ import csv
 import json
 import yaml
 import gzip
-import pysam
+
+# import pysam # HACK pysam isn't available on bioconda aarch64, yet. But loading it here cause every other function of cojac to fail, too.
 
 import click
 
@@ -121,6 +122,8 @@ def findbam(prefix, batch, sample):
 
 def scanbam(alnfname, amplicons, rq_chr):
     """scan a bamfile found at alnfname"""
+    import pysam  # HACK pysam isn't available on bioconda aarch64, yet. So hot-load it only in the function that requires it. This lets all other parts of cojac working without it.
+
     amp_results = {}
     with pysam.AlignmentFile(alnfname, "rb") as alnfile:
         if rq_chr == None:
