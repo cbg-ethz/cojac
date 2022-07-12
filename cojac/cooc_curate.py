@@ -26,6 +26,11 @@ server = "https://cov-spectrum.ethz.ch/gisaid/api/v1"
 
 def getAccessKey():
     # TODO proper global handling
+
+    # envrionment, e.g.: test workflow uses that
+    if "COVSPECTRUM_ACCESSKEY" in os.environ:
+        return os.environ["COVSPECTRUM_ACCESSKEY"]
+
     try:
         # we use ~/.netrc to obtain credentials
         import netrc
@@ -39,7 +44,8 @@ def getAccessKey():
             f"```\n"
             f"machine {urlparse(server).netloc}\n"
             f"password <YOUR_ACCESS_KEY_HERE>\n"
-            f"```\n",
+            f"```\n"
+            f"or use the COVSPECTRUM_ACCESSKEY envrionment variable\n",
             file=sys.stderr,
         )
         # sys.exit(1)

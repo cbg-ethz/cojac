@@ -24,6 +24,8 @@ jobs:
           poetry build
 
       - name: Test package
+        env:
+            COVSPECTRUM_ACCESSKEY: ${{ secrets.COVSPECTRUM_ACCESSKEY }}
         run: poetry run pytest -v
 
       - name: Lint package
