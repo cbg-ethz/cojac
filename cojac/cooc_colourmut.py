@@ -108,11 +108,11 @@ def cooc_colourmut(amp, json_fname, yaml_fname):
             sites_cnt_l = -1
             sites_cnt = 0
             if amp["sites"]:  # empty ?
-                (sites_cnt_l, sites_cnt) = list(amp["sites"].items())[-1]
+                (sites_cnt_l, sites_cnt) = map(int, list(amp["sites"].items())[-1])
             muts_cnt_l = -1
             muts_cnt = 0
             if amp["muts"]:  # empty ?
-                (muts_cnt_l, muts_cnt) = list(amp["muts"].items())[-1]
+                (muts_cnt_l, muts_cnt) = map(int, list(amp["muts"].items())[-1])
 
             # pretty print
             if sites_cnt:
