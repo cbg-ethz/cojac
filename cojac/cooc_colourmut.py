@@ -102,6 +102,7 @@ def cooc_colourmut(amp, json_fname, yaml_fname):
             amplicon_nfo
         ):  # instead of `ampname,amp in amplicons.items():`, to keep order consistent with column titles.
             amp = amplicons[ampname]
+            amp_cnt_l = len(amp_str[ampname][4])
 
             # get topmost
             sites_cnt_l = -1
@@ -117,14 +118,14 @@ def cooc_colourmut(amp, json_fname, yaml_fname):
             if sites_cnt:
                 print(f"{sites_cnt :>9}", end="")
                 if muts_cnt:
-                    if muts_cnt_l != sites_cnt_l:
+                    if muts_cnt_l != amp_cnt_l:  # sites_cnt_l:
                         print(
-                            f"\x1b[33;1m{muts_cnt :>9}{f'({muts_cnt_l}/{sites_cnt_l})' :>9}\x1b[0m",
+                            f"\x1b[33;1m{muts_cnt :>9}{f'({muts_cnt_l :1x}/{sites_cnt_l :1x}/{amp_cnt_l :1x})' :>9}\x1b[0m",
                             end="",
                         )
                     else:
                         print(
-                            f"\x1b[32;1m{muts_cnt :>9}{100*muts_cnt/sites_cnt :7.2f}%{sites_cnt_l}\x1b[0m",
+                            f"\x1b[32;1m{muts_cnt :>9}{100*muts_cnt/sites_cnt :7.2f}%{sites_cnt_l :1x}\x1b[0m",
                             end="",
                         )
                 else:
