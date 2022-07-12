@@ -5,6 +5,7 @@ import os
 import sys
 import re
 import requests
+from urllib.parse import urlparse
 
 # import csv
 import json
@@ -29,13 +30,29 @@ def getAccessKey():
         # we use ~/.netrc to obtain credentials
         import netrc
 
-        return netrc.netrc().authenticators("cov-spectrum.ethz.ch")[2]
+        return netrc.netrc().authenticators(urlparse(server).netloc)[2]
     except:
         print(
-            "no access key found for cov-spectrum.ethz.ch in ~/.netrc\n",
+            f"no access key found for cov-spectrum.ethz.ch in ~/.netrc\n"
+            f"your requests are likely to be not allowed by the server\n"
+            f"please add the following entry in your ~/.netrc:\n"
+            f"```\n"
+            f"machine {urlparse(server).netloc}\n"
+            f"password <YOUR_ACCESS_KEY_HERE>\n"
+            f"```\n",
             file=sys.stderr,
         )
+        # sys.exit(1)
+
+
+def checkerror(reply):
+    if reply["data"] is None:
+        # TODO prety-printing would help
+        print("Error from server:", json.dumps(reply, indent=2))
+        # TODO replace with proper exception throwing in the future
         sys.exit(1)
+
+    return reply
 
 
 def nucmutations(**kwargs):
@@ -48,11 +65,7 @@ def nucmutations(**kwargs):
         requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text
     )
 
-    if reply["data"] is None:
-        # TODO prety-printing would help
-        print(reply)
-        # TODO replace with proper exception throwing in the future
-        sys.exit(1)
+    checkerror(reply)
 
     return reply["data"]
 
@@ -73,11 +86,7 @@ def aggregated(**kwargs):
     kwargs["accessKey"] = getAccessKey()
     reply = json.loads(requests.get(f"{server}/sample/aggregated", params=kwargs).text)
 
-    if reply["data"] is None:
-        # TODO prety-printing would help
-        print(reply)
-        # TODO replace with proper exception throwing in the future
-        sys.exit(1)
+    checkerror(reply)
 
     return reply["data"]
 

@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
 
+import typing
+import re
+
 import click
 import yaml
 
 from .cooc_curate import listfilteredmutations
+
+
+# regex
+parsenuc = re.compile(
+    "^(?P<orig>[ATGC])(?P<pos>\d+)(?P<mut>[\-ATCG])$", flags=re.IGNORECASE
+)
 
 
 @click.command(
@@ -50,9 +59,6 @@ from .cooc_curate import listfilteredmutations
     "debug",
     default=False,
 )
-# @click.argument("var", nargs=-1)
-
-
 def sig_generate(var, minfreq, minseqs, extras, debug):
     if debug:
         import sys
@@ -60,10 +66,48 @@ def sig_generate(var, minfreq, minseqs, extras, debug):
         print(
             "extra:\n", yaml.load(extras, Loader=yaml.FullLoader), "\n", file=sys.stderr
         )
-    for m in listfilteredmutations(
+
+    mut_record = typing.NamedTuple("mut_record", [("mut", str), ("orig", str)])
+
+    # load the mutation found by the request
+    mutlist = {}
+    for mut in listfilteredmutations(
         var,
         minfreq=minfreq,
         minseqs=minseqs,
         extras=yaml.load(extras, Loader=yaml.FullLoader) if extras else {},
     ):
-        print(m)
+        # parse single nucleotide mutation
+        try:
+            m = parsenuc.match(mut).groupdict()
+        except:
+            print(f"Cannot parse <{mut}>\n")
+            next
+
+        mutlist[int(m["pos"])] = mut_record(mut=m["mut"], orig=m["orig"])
+
+    # sort and merge/extend consecutive
+    mutmerged = {}
+    for p, m in sorted(mutlist.items(), reverse=True):
+        # consecutive positions ?
+        nxt = p + 1
+        if nxt in mutmerged:
+            n = mutmerged[nxt]
+            # are we extending a deletion? or nucleotides?
+            if (m.mut == "-" and n.mut[0] == "-") or (m.mut != "-" and n.mut[0] != "-"):
+                del mutmerged[nxt]
+                mutmerged[p] = mut_record(mut=m.mut + n.mut, orig=m.orig + n.orig)
+                continue
+
+        # new mutation, not extending
+        mutmerged[p] = m
+
+    # TODO check neighbors for repeat patterns (i.e.: alternate deletion position span)
+
+    # display
+    for p, m in sorted(mutmerged.items()):
+        if m.mut == "-" * len(m.mut):
+            # deletion
+            print(f"  {p}: '{m.mut}'")
+        else:
+            print(f"  {p}: '{m.orig}>{m.mut}'")
