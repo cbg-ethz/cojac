@@ -255,7 +255,7 @@ def bed_load(bedfile):
     return amp_bed
 
 
-def make_all_amplicons(bedfile, vocdir, n_cooc=2):
+def make_all_amplicons(bedfile, vocdir, revert=False, n_cooc=2):
     """given a .BED file and a directory with YAMLs decribing VOCs,
     generates all amplicons to search that have at least n_cooc mutations
     """
@@ -269,7 +269,14 @@ def make_all_amplicons(bedfile, vocdir, n_cooc=2):
         full_path = os.path.join(vocdir, path)
         with open(full_path, "r") as yf:
             loaded_yaml = yaml.load(yf, Loader=yaml.FullLoader)
-        loaded_yamls.append(filter_decode_vartiant(loaded_yaml))
+        loaded_yamls.append(
+            filter_decode_vartiant(
+                loaded_yaml,
+                categories=["revert", "mut", "extra", "shared", "subset"]
+                if revert
+                else ["mut", "extra", "shared", "subset"],
+            )
+        )
 
     # make amplicon dict for each voc
     amplicons = {}
@@ -412,6 +419,13 @@ def write_all_amplicons(amplicons, outamp):
     help="directory containing the yamls defining the variant of concerns",
 )
 @click.option(
+    "--rev/--no-rev",
+    "--with-revert/--without-revert",
+    "revert",
+    default=False,
+    help="also include reverts when compiling amplicons (requires VOC YAML files with revert category)",
+)
+@click.option(
     "-b",
     "--bedfile",
     metavar="BED",
@@ -495,6 +509,7 @@ def cooc_mutbamscan(
     prefix,
     rq_chr,
     vocdir,
+    revert,
     bedfile,
     cooc,
     inamp,
@@ -511,7 +526,7 @@ def cooc_mutbamscan(
         amplicons = load_all_amplicons(inamp)
     else:
         # compute amplicons
-        amplicons = make_all_amplicons(bedfile, vocdir, cooc)
+        amplicons = make_all_amplicons(bedfile, vocdir, revert=revert, n_cooc=cooc)
         # and save them for future reference
         if outamp:
             write_all_amplicons(amplicons, outamp)

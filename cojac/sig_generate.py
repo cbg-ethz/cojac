@@ -46,7 +46,16 @@ parsenuc = re.compile(
     help="Minimum frequency for inclusion in list",
 )
 @click.option(
-    "-f",
+    "-d",
+    "--mindelfreq",
+    "mindelfreq",
+    metavar="FREQ",
+    default=None,
+    type=float,
+    help="Use a different minimum frequency for deletions (useful early on when there are few sequences and some of those were produced by pipeline that don't handle deletions)",
+)
+@click.option(
+    "-s",
     "--minseqs",
     "minseqs",
     metavar="NUM",
@@ -59,7 +68,7 @@ parsenuc = re.compile(
     "debug",
     default=False,
 )
-def sig_generate(var, minfreq, minseqs, extras, debug):
+def sig_generate(var, minfreq, mindelfreq, minseqs, extras, debug):
     if debug:
         import sys
 
@@ -74,6 +83,7 @@ def sig_generate(var, minfreq, minseqs, extras, debug):
     for mut in listfilteredmutations(
         var,
         minfreq=minfreq,
+        mindelfreq=mindelfreq,
         minseqs=minseqs,
         extras=yaml.load(extras, Loader=yaml.FullLoader) if extras else {},
     ):

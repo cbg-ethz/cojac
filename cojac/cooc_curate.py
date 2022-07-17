@@ -124,11 +124,20 @@ def mutsinlineages(*mutations):
 #
 
 
-def listfilteredmutations(lineage, minfreq=0.8, minseqs=100, extras={}):
+def listfilteredmutations(
+    lineage, minfreq=0.8, minseqs=100, mindelfreq=None, extras={}
+):
+    """select mutations to make a signature
+    - optionnally uses an alternate minimal frequency for deletions
+      (useful early on when there are few sequences, some of them produced
+      by pipelines which don't handle deletions.)
+    """
     return set(
         m["mutation"]
         for m in listmutations(lineage, extras)
-        if m["proportion"] > minfreq and m["count"] > minseqs
+        if m["proportion"]
+        > (minfreq if mindelfreq is None or m["mutation"][-1] != "-" else mindelfreq)
+        and m["count"] > minseqs
     )
 
 
