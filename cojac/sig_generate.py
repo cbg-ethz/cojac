@@ -5,6 +5,7 @@ import re
 
 import click
 import yaml
+import csv
 
 from .cooc_curate import listfilteredmutations
 
@@ -64,11 +65,19 @@ parsenuc = re.compile(
     help="Minimum number of sequence supporting for inclusion in list",
 )
 @click.option(
+    "--covariants",
+    "covariants",
+    metavar="TSV",
+    default=None,
+    type=str,
+    help="import from a covariants.org TSV file instead of covSpectrum. (See: https://github.com/hodcroftlab/covariants/blob/master/defining_mutations/)",
+)
+@click.option(
     "--debug/--no-debug",
     "debug",
     default=False,
 )
-def sig_generate(var, minfreq, mindelfreq, minseqs, extras, debug):
+def sig_generate(var, minfreq, mindelfreq, minseqs, extras, covariants, debug):
     if debug:
         import sys
 
@@ -76,17 +85,29 @@ def sig_generate(var, minfreq, mindelfreq, minseqs, extras, debug):
             "extra:\n", yaml.load(extras, Loader=yaml.FullLoader), "\n", file=sys.stderr
         )
 
+    # get initial list
+    mut_request = []
+    if not covariants:
+        # fetch it from covSpectrum
+        mut_request = listfilteredmutations(
+            var,
+            minfreq=minfreq,
+            mindelfreq=mindelfreq,
+            minseqs=minseqs,
+            extras=yaml.load(extras, Loader=yaml.FullLoader) if extras else {},
+        )
+    else:
+        # decode it from a TSV file from covariants.org
+        with open(covariants, newline="") as csvfile:
+            reader = csv.DictReader(csvfile, dialect="excel-tab")
+            mut_request = [row["nuc_change"] for row in reader]
+            # TODO handle all the additional metadata in other columns, like in tsv2cojac.py prototype
+
     mut_record = typing.NamedTuple("mut_record", [("mut", str), ("orig", str)])
 
     # load the mutation found by the request
     mutlist = {}
-    for mut in listfilteredmutations(
-        var,
-        minfreq=minfreq,
-        mindelfreq=mindelfreq,
-        minseqs=minseqs,
-        extras=yaml.load(extras, Loader=yaml.FullLoader) if extras else {},
-    ):
+    for mut in mut_request:
         # parse single nucleotide mutation
         try:
             m = parsenuc.match(mut).groupdict()
