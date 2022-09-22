@@ -21,7 +21,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 #
 
 
-server = "https://cov-spectrum.ethz.ch/gisaid/api/v1"
+server = "https://lapis.cov-spectrum.org/gisaid/v1"
 
 
 def getAccessKey():
@@ -52,7 +52,7 @@ def getAccessKey():
 
 
 def checkerror(reply):
-    if reply["data"] is None:
+    if reply.get("data", None) is None:
         # TODO prety-printing would help
         print("Error from server:", json.dumps(reply, indent=2))
         # TODO replace with proper exception throwing in the future

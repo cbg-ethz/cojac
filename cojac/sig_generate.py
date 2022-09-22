@@ -35,7 +35,9 @@ parsenuc = re.compile(
     metavar="LAPIS",
     default=None,
     type=str,
-    help="Additional LAPIS query arguments passed as a YAML flow, e.g.: 6-of: S:147E, S:152R, S:157L, S:210V, S:257S, S:339H, S:446S, S:460K, ORF1a:1221L, ORF1a:1640S, ORF1a:4060S }",
+    help="Additional LAPIS query arguments passed as a YAML flow, e.g.: '"
+    '{dateFrom: "2022-02-01", variantQuery: "[6-of: S:147E, S:152R, S:157L, S:210V, S:257S, S:339H, S:446S, S:460K, ORF1a:1221L, ORF1a:1640S, ORF1a:4060S]"}'
+    "'. For more information about LAPIS, see: https://lapis-docs.readthedocs.io/en/latest/",
 )
 @click.option(
     "-f",
