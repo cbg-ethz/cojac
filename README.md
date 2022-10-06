@@ -33,25 +33,36 @@ Usage: cojac cooc-mutbamscan [OPTIONS]
   Scan amplicon (covered by long read pairs) for mutation cooccurrence
 
 Options:
-  -s, --samples TSV          V-pipe samples list tsv
-  -a, --alignments BAM/CRAM  alignment files
-  -, --batchname TEXT        concatenate samplename/batchname from samples tsv
-  -p, --prefix PATH          V-pipe work directory prefix for where to look at
-                             align files when using TSV samples list
-  -r, --reference REFID      reference to look for in alignment files
-  -m, --vocdir DIR           directory containing the yamls defining the
-                             variant of concerns
-  -b, --bedfile BED          bedfile defining the amplicons, with format:
-                             ref\tstart\tstop\tamp_num\tpool\tstrand
-  -#, --cooc COOC            minimum number of cooccurences to search for
-  -Q, --in-amplicons YAML    use the supplied YAML file to query amplicons
-                             instead of building it from BED + voc's DIR
-  -A, --out-amplicons YAML   output amplicon query in a YAML file
-  -j, --json JSON            output results to as JSON file
-  -y, --yaml YAML            output results to as yaml file
-  -t, --tsv TSV              output results to as (raw) tsv file
-  -d, --dump                 dump the python object to the terminal
-  --help                     Show this message and exit.
+  -a, --alignments BAM/CRAM       alignment files
+  -n, --name NAME                 when using alignment files, name to use for
+                                  the output
+  -s, --samples TSV               V-pipe samples list tsv
+  --batchname SEP                 concatenate samplename/batchname from
+                                  samples tsv
+  -p, --prefix PATH               V-pipe work directory prefix for where to
+                                  look at align files when using TSV samples
+                                  list
+  -r, --reference REFID           reference to look for in alignment files
+  -m, --vocdir DIR                directory containing the yamls defining the
+                                  variant of concerns
+  --rev, --with-revert / --no-rev, --without-revert
+                                  also include reverts when compiling
+                                  amplicons (requires VOC YAML files with
+                                  revert category)
+  -b, --bedfile BED               bedfile defining the amplicons, with format:
+                                  ref\tstart\tstop\tamp_num\tpool\tstrand
+  -#, --cooc COOC                 minimum number of cooccurences to search for
+  -Q, --amplicons, --in-amp, --in-amplicons YAML
+                                  use the supplied YAML file to query
+                                  amplicons instead of building it from BED +
+                                  voc's DIR
+  -A, --out-amp, --out-amplicons YAML
+                                  output amplicon query in a YAML file
+  -j, --json JSON                 output results to as JSON file
+  -y, --yaml YAML                 output results to as yaml file
+  -t, --tsv TSV                   output results to as (raw) tsv file
+  -d, --dump                      dump the python object to the terminal
+  --help                          Show this message and exit.
 
   @listfile can be used to pass a long list of parameters (e.g.: a large
   number of BAMs) in a file instead of command line
@@ -374,7 +385,7 @@ You can install _cojac_ in its own environment and activate it:
 conda create -n cojac cojac
 conda activate cojac
 # test it
-cooc-mutbamscan --help
+cojac cooc-mutbamscan --help
 ```
 
 And to update it to the latest version, run:
@@ -400,11 +411,15 @@ We recommend using conda to install them:
 ```bash
 conda env create -f conda_cojac_env.yaml
 conda activate cojac
-# now run from the cojac directory
-cojac cooc-mutbamscan --help
 ```
 
-_cojac_ itself doesn't have a specific installer (yet) but you can copy its executables in your _PATH_ (so you can call them without specifying their location), e.g.: into the conda environment:
+Install _cojac_ using pip:
+```bash
+pip install .
+# this will autodetect dependencies already installed by conda
+```
+
+cojac should now be accessible from your PATH
 
 ```bash
 # activate the environment if not already active:
@@ -440,7 +455,7 @@ The subdirectory [`notebooks/`](notebooks/) contains Jupyter and Rstudio noteboo
 - [x] ~~further jupyter and rstudio code from the publication~~
 - [x] ~~Move hard-coded amplicons to BED input file~~
 - [x] ~~Move hard-coded mutations to YAML configuration~~
-- [x] Refactor code into proper Python package
+- [x] ~~Refactor code into proper Python package~~
 
 Long term goal:
 

@@ -369,18 +369,26 @@ def write_all_amplicons(amplicons, outamp):
     epilog="@listfile can be used to pass a long list of parameters (e.g.: a large number of BAMs) in a file instead of command line",
 )
 @click.option(
-    "-s",
-    "--samples",
-    metavar="TSV",
-    type=str,
-    help="V-pipe samples list tsv",
-)
-@click.option(
     "-a",
     "--alignments",
     metavar="BAM/CRAM",
     multiple=True,
     help="alignment files",
+)
+@click.option(
+    "-n",
+    "--name",
+    metavar="NAME",
+    multiple=True,
+    default=None,
+    help="when using alignment files, name to use for the output",
+)
+@click.option(
+    "-s",
+    "--samples",
+    metavar="TSV",
+    type=str,
+    help="V-pipe samples list tsv",
 )
 @click.option(
     "--batchname",
@@ -505,6 +513,7 @@ def write_all_amplicons(amplicons, outamp):
 def cooc_mutbamscan(
     samples,
     alignments,
+    name,
     batchname,
     prefix,
     rq_chr,
@@ -551,8 +560,10 @@ def cooc_mutbamscan(
     # loop for if samples are given through -a option
     # this option can also de used to dispatch per sample jobx on the cluster
     elif alignments is not None:
-        for alnfname in alignments:
-            sample = alnfname  # HACK use the whole BAM file as sample name
+        if name:
+            assert len(alignments) == len(name), f"Error: the number of BAMs/CRAMs files given to the -a/--alignments parameter and the number of NAMEs given to -n/--name must mach.\n{len(alignments)} BAM(s)/CRAM(s) given vs {len(name)} NAMEs"
+        for alnfname,sample in zip(alignments, name if name else alignments):
+            # HACK use the whole BAM file as sample name if no names provided
             table[sample] = scanbam(alnfname, amplicons, rq_chr)
     else:
         # we only wrote out the outamp and have nothing else to do.
