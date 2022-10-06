@@ -255,7 +255,7 @@ def bed_load(bedfile):
     return amp_bed
 
 
-def make_all_amplicons(bedfile, vocdir, revert=False, n_cooc=2):
+def make_all_amplicons(bedfile, vocs, revert=False, n_cooc=2):
     """given a .BED file and a directory with YAMLs decribing VOCs,
     generates all amplicons to search that have at least n_cooc mutations
     """
@@ -265,8 +265,7 @@ def make_all_amplicons(bedfile, vocdir, revert=False, n_cooc=2):
 
     # load all voc yamls
     loaded_yamls = []
-    for path in [p for p in os.listdir(vocdir) if not p.startswith(".")]:
-        full_path = os.path.join(vocdir, path)
+    for full_path in vocs:
         with open(full_path, "r") as yf:
             loaded_yaml = yaml.load(yf, Loader=yaml.FullLoader)
         loaded_yamls.append(
@@ -422,9 +421,18 @@ def write_all_amplicons(amplicons, outamp):
     "--vocdir",
     metavar="DIR",
     required=False,
-    default="./voc",
+    default=None,
     type=str,
     help="directory containing the yamls defining the variant of concerns",
+)
+@click.option(
+    "-V",
+    "--voc",
+    metavar="VOC",
+    multiple=True,
+    default=None,
+    type=str,
+    help="individual yamls defining the variant of concerns",
 )
 @click.option(
     "--rev/--no-rev",
@@ -518,6 +526,7 @@ def cooc_mutbamscan(
     prefix,
     rq_chr,
     vocdir,
+    voc,
     revert,
     bedfile,
     cooc,
@@ -534,8 +543,18 @@ def cooc_mutbamscan(
         # load pre-computed amplicons
         amplicons = load_all_amplicons(inamp)
     else:
+        if vocdir:
+            if not voc:
+                voc = []
+            voc += [
+                os.path.join(vocdir, path)
+                for path in [p for p in os.listdir(vocdir) if not p.startswith(".")]
+            ]
         # compute amplicons
-        amplicons = make_all_amplicons(bedfile, vocdir, revert=revert, n_cooc=cooc)
+        assert (
+            len(voc) > 0
+        ), "Neither --voc nor --vocdir provided. Please provide variants of concern definition yamls."
+        amplicons = make_all_amplicons(bedfile, voc, revert=revert, n_cooc=cooc)
         # and save them for future reference
         if outamp:
             write_all_amplicons(amplicons, outamp)
@@ -561,8 +580,10 @@ def cooc_mutbamscan(
     # this option can also de used to dispatch per sample jobx on the cluster
     elif alignments is not None:
         if name:
-            assert len(alignments) == len(name), f"Error: the number of BAMs/CRAMs files given to the -a/--alignments parameter and the number of NAMEs given to -n/--name must mach.\n{len(alignments)} BAM(s)/CRAM(s) given vs {len(name)} NAMEs"
-        for alnfname,sample in zip(alignments, name if name else alignments):
+            assert len(alignments) == len(
+                name
+            ), f"Error: the number of BAMs/CRAMs files given to the -a/--alignments parameter and the number of NAMEs given to -n/--name must mach.\n{len(alignments)} BAM(s)/CRAM(s) given vs {len(name)} NAMEs"
+        for alnfname, sample in zip(alignments, name if name else alignments):
             # HACK use the whole BAM file as sample name if no names provided
             table[sample] = scanbam(alnfname, amplicons, rq_chr)
     else:
