@@ -22,7 +22,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 
 
 server = "https://lapis.cov-spectrum.org/gisaid/v1"
-
+lintype = "nextcladePangoLineage" # pangoLineage
 
 def getAccessKey():
     # TODO proper global handling
@@ -38,7 +38,7 @@ def getAccessKey():
         return netrc.netrc().authenticators(urlparse(server).netloc)[2]
     except:
         print(
-            f"no access key found for cov-spectrum.ethz.ch in ~/.netrc\n"
+            f"no access key found for {urlparse(server).netloc} in ~/.netrc\n"
             f"your requests are likely to be not allowed by the server\n"
             f"please add the following entry in your ~/.netrc:\n"
             f"```\n"
@@ -81,7 +81,7 @@ def listmutations(lineage, extras={}):
     if "variantQuery" in extras.keys():
         # NOTE according to covspectrum: "Please specify the variant either by using the fields pangoLineage, nextstrainClade, gisaidClade, aaMutations and nucMutations, or by using variantQuery - don't use both at the same time."
         return nucmutations(**extras)
-    return nucmutations(pangoLineage=(lineage + "*"), **extras)
+    return nucmutations(**{ lintype: (lineage + "*") }, **extras)
 
 
 def aggregated(**kwargs):
@@ -100,22 +100,22 @@ def aggregated(**kwargs):
 def listsublineages(lineage):
     """list all lineages which are known to be either the variant it self or one of its sub-variants"""
     return set(
-        s["pangoLineage"]
-        for s in aggregated(pangoLineage=(lineage + "*"), fields="pangoLineage")
+        s[lintype]
+        for s in aggregated(**{ lintype: (lineage + "*") }, fields=lintype)
     )
 
 
 def listalllineages():
     """structure listing known lineages and their respective total count of samples"""
-    return {s["pangoLineage"]: s["count"] for s in aggregated(fields="pangoLineage")}
+    return {s[lintype]: s["count"] for s in aggregated(fields=lintype)}
 
 
 def mutsinlineages(*mutations):
     """looks for presence of specific mutations,
     return lineages and count of samples carrying them"""
     return {
-        s["pangoLineage"]: s["count"]
-        for s in aggregated(nucMutations=",".join(mutations), fields="pangoLineage")
+        s[lintype]: s["count"]
+        for s in aggregated(nucMutations=",".join(mutations), fields=lintype)
     }
 
 
@@ -221,23 +221,23 @@ def curate_muts(
         su = {combined}
     else:
         su = set(sublineages)
-    # print(muts)
+    #print(muts)
     freqs = freqperlineage(muts, alllin)
-    # print(freqs)
+    #print(freqs)
     (s, o, r) = rank(su, freqs, limit=low)
-    # print(s,o,r)
+    #print(s,o,r)
 
     fi = [i for i in freqs.items()]
     # print({p:fi[p-1] for p in [s,o,r]})
 
     isspecific = (o is None) or (
-        (s < o) and (fi[s - 1][1] >= high) and (fi[o - 1][1] <= low)
+        (s is not None) and (s < o) and (fi[s - 1][1] >= high) and (fi[o - 1][1] <= low)
     )
     print(f"{marker if isspecific else ''}{label}: ", end=endl)
     end = min(
         15,
         len(fi),
-        max(s + 1, o + 1 if o is not None else 0),
+        max(s + 1 if s is not None else 0, o + 1 if o is not None else 0),
         (r + 1 if r is not None else 9999),
     )
     for i in range(0, end):
@@ -245,7 +245,7 @@ def curate_muts(
         print(f"{', ' if i else ''}{marker if v in su else ''}{v}={f:.2f}", end=endl)
 
     # way after max
-    if s > end:
+    if s is not None and s > end:
         v, f = fi[s - 1]
         print(f" {chr(0x2026)} [{s}]:{marker}{v}={f:.2f}", end=endl)
 

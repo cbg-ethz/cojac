@@ -7,7 +7,7 @@ name = "cojac"
 version = "0.2"
 description = "A set of commandline tools to analyse co-occurrence of mutations on amplicons."
 license = "GPL"
-authors = ["tba"]
+authors = ["David Dreifuss <dadreifuss@gmail.com>", "Ivan Blagoev Topolsky <ivan.topolsky@bsse.ethz.ch>", "kpj <kim.philipp.jablonski@gmail.com>"]
 readme = "README.md"
 repository = "https://github.com/cbg-ethz/cojac"
 
@@ -16,7 +16,7 @@ python = "^3.8.0"
 numpy = ">=1.2"
 pandas = ">=1.0"
 PyYAML = "^6.0"
-pysam = "^0.18.0"
+pysam = ">=0.18.0"
 strictyaml = "^1.6.1"
 click = "^8.0.3"
 requests = "^2.27.1"
