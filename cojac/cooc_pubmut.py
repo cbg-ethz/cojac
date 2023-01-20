@@ -178,7 +178,7 @@ def cooc_pubmut(
     table = {}
 
     assert not (
-        semi and csv_file.rfind(".tsv") != -1
+        semi and csv_fname.rfind(".tsv") != -1
     ), f"Excel cannot use TSV files {csv_fname}"
 
     if json_fname:
