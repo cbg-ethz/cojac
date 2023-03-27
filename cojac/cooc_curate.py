@@ -21,8 +21,28 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 #
 
 
-server = "https://lapis.cov-spectrum.org/gisaid/v1"
-lintype = "nextcladePangoLineage" # pangoLineage
+server = "https://lapis.cov-spectrum.org/open/v1"
+lintype = "nextcladePangoLineage"
+
+
+def setURL(url):
+    """
+    Switch to a different API end-point:
+    - https://lapis.cov-spectrum.org/open/v1 : ENA open sequences
+    - https://lapis.cov-spectrum.org/gisaid/v1 : GISAID sequences
+    Note: Acess keys are mandatory on non-open end-points
+    """
+    server = url
+
+
+def setLinType(lin):
+    """
+    Switch the lineage we're looking for:
+    - nextcladePangoLineage : as found by nextclade
+    - pangoLineage : as provided by GISAID
+    """
+    lintype = lin
+
 
 def getAccessKey():
     # TODO proper global handling
@@ -45,7 +65,9 @@ def getAccessKey():
             f"machine {urlparse(server).netloc}\n"
             f"password <YOUR_ACCESS_KEY_HERE>\n"
             f"```\n"
-            f"or use the COVSPECTRUM_ACCESSKEY envrionment variable\n",
+            f"or use the COVSPECTRUM_ACCESSKEY envrionment variable\n"
+            if "open" not in server
+            else f"(not using access keys on API {server})",
             file=sys.stderr,
         )
         # sys.exit(1)
@@ -257,6 +279,15 @@ def curate_muts(
     epilog="This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/",
 )
 @click.option(
+    "-u",
+    "--url",
+    metavar="URL",
+    required=False,
+    default=None,
+    type=str,
+    help="url to use when contact covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+)
+@click.option(
     "-a",
     "--amplicons",
     "amp",
@@ -303,7 +334,9 @@ def curate_muts(
     help="use coloured output",
 )
 @click.argument("voc", nargs=-1)
-def cooc_curate(amp, domuts, high, low, collapse, colour, voc):
+def cooc_curate(url, amp, domuts, high, low, collapse, colour, voc):
+    if url:
+        setURL(url)
     amplicons = None
     if amp:
         with open(amp, "r") as yf:

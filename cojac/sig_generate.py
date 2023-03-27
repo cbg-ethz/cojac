@@ -7,7 +7,7 @@ import click
 import yaml
 import csv
 
-from .cooc_curate import listfilteredmutations
+from .cooc_curate import listfilteredmutations, setURL
 
 
 # regex
@@ -19,6 +19,15 @@ parsenuc = re.compile(
 @click.command(
     help="Helps generating a list of mutations frequently found in a variant by querying CoV-Spectrum",
     epilog="This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/",
+)
+@click.option(
+    "-u",
+    "--url",
+    metavar="URL",
+    required=False,
+    default=None,
+    type=str,
+    help="url to use when contact covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
 )
 @click.option(
     "--var",
@@ -79,7 +88,10 @@ parsenuc = re.compile(
     "debug",
     default=False,
 )
-def sig_generate(var, minfreq, mindelfreq, minseqs, extras, covariants, debug):
+def sig_generate(url, var, minfreq, mindelfreq, minseqs, extras, covariants, debug):
+    if url:
+        setURL(url)
+
     if debug:
         import sys
 
