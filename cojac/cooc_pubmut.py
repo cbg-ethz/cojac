@@ -65,18 +65,10 @@ import click
 )
 # TODO: add mutually exclusive options
 @click.option(
-    "-e",
-    "--escape",
+    "-e/-E",
+    "--escape/--no-escape",
     "escape",
-    flag_value=("\n", csv.QUOTE_MINIMAL, None),
-    default=True,
-    help="use escape characters for newlines",
-)
-@click.option(
-    "-e",
-    "--escape",
-    "escape",
-    flag_value=("\\n", csv.QUOTE_NONNUMERIC, "\\"),
+    default=False,
     help="use escape characters for newlines",
 )
 @click.option(
@@ -88,19 +80,13 @@ import click
     help="use a semi-colon ';' instead of a comma ',' in the comma-separated-files as required by Microsoft Excel",
 )
 @click.option(
-    "-/",
     "--batchname",
     "batchname",
-    flag_value=None,
-    default=True,
-    help="split samplename/batchname (as in samples tsv)",
-)
-@click.option(
-    "-/",
-    "--batchname",
-    "batchname",
-    flag_value="/",
-    help="split samplename/batchname (as in samples tsv)",
+    metavar="SEP",
+    required=False,
+    default=None,
+    type=str,
+    help="separator used to split samplename/batchname in separate column",
 )
 @click.option(
     "-q",
@@ -112,7 +98,7 @@ import click
 def cooc_pubmut(
     vocdir, amp, json_fname, yaml_fname, csv_fname, escape, semi, batchname, quiet
 ):
-    escape = eval(escape)  # TODO: oh no... But how else to pass tuple?
+    escape = ("\\n", csv.QUOTE_NONNUMERIC, "\\") if escape else ("\n", csv.QUOTE_MINIMAL, None)
 
     # TODO make the "header prettification" code more generic and share with colourmut
 
@@ -203,7 +189,7 @@ def cooc_pubmut(
         ksam = None
         if batchname:
             (sam, ignore, batch) = sam.rpartition(batchname)
-            ksam = (sam, batch)
+            ksam = (sam, batch) if sam and batch else sam or batch
         else:
             ksam = sam
         df_dict[ksam] = {}

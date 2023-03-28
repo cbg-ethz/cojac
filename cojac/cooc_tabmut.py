@@ -47,7 +47,7 @@ import click
     required=False,
     default="scanned_table.csv",
     type=str,
-    help="name of (pretty) csv file to save the table into",
+    help="name of (raw) csv file to save the table into",
 )
 @click.option(
     "-l",
@@ -100,7 +100,7 @@ def cooc_tabmut(
     assert len(table) > 0, "cannot succesfully load table"
 
     #
-    # pretty output for article
+    # tabluar output for down-stream processing
     #
 
     if lines:
@@ -112,7 +112,10 @@ def cooc_tabmut(
         ksam = None
         if batchname:
             (sam, ignore, batch) = sam.rpartition(batchname)
-            ksam = (sam, batch)
+            ksam = (sam, batch) if sam and batch else sam or batch
+            if not sam:
+                sam = batch
+                batch = None
         else:
             ksam = sam
         if (not lines) and (ksam not in df_dict):
@@ -185,7 +188,7 @@ def cooc_tabmut(
             )  # , inplace=True)
     # rstudio_table_df.index.rename('sample', inplace=True)
 
-    # TODO rename column with pretty names. (like in colourmut)
+
     if not quiet:
         with pd.option_context(
             "display.max_rows", None

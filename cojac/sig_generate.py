@@ -18,7 +18,7 @@ parsenuc = re.compile(
 
 @click.command(
     help="Helps generating a list of mutations frequently found in a variant by querying CoV-Spectrum",
-    epilog="This tool queries LAPIS, see https://lapis.cov-spectrum.org/swagger/ and https://lapis.cov-spectrum.org/",
+    epilog="This tool queries LAPIS, see https://lapis-docs.readthedocs.io/en/latest/",
 )
 @click.option(
     "-u",
