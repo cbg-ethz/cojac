@@ -57,7 +57,7 @@ def phe2cojac(shortname, outname, fname):
     )
 
     for bl in yam["belongs-to-lineage"]:
-        for (s, l) in bl.items():
+        for s, l in bl.items():
             if s == "PANGO":
                 outy["variant"]["pangolin"] = l
             elif s == "nextstrain":
@@ -113,7 +113,7 @@ def phe2cojac(shortname, outname, fname):
     # start writing
     with open(outname, "wt") if outname is not None else sys.stdout as yf:
         print(yaml.dump(outy, sort_keys=False), end="", file=yf)
-        for (t, s) in variants.items():
+        for t, s in variants.items():
             if 0 == len(s):
                 continue
             print(f"{t}:", file=yf)

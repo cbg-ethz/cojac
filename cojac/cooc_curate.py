@@ -103,7 +103,7 @@ def listmutations(lineage, extras={}):
     if "variantQuery" in extras.keys():
         # NOTE according to covspectrum: "Please specify the variant either by using the fields pangoLineage, nextstrainClade, gisaidClade, aaMutations and nucMutations, or by using variantQuery - don't use both at the same time."
         return nucmutations(**extras)
-    return nucmutations(**{ lintype: (lineage + "*") }, **extras)
+    return nucmutations(**{lintype: (lineage + "*")}, **extras)
 
 
 def aggregated(**kwargs):
@@ -122,8 +122,7 @@ def aggregated(**kwargs):
 def listsublineages(lineage):
     """list all lineages which are known to be either the variant it self or one of its sub-variants"""
     return set(
-        s[lintype]
-        for s in aggregated(**{ lintype: (lineage + "*") }, fields=lintype)
+        s[lintype] for s in aggregated(**{lintype: (lineage + "*")}, fields=lintype)
     )
 
 
@@ -243,11 +242,11 @@ def curate_muts(
         su = {combined}
     else:
         su = set(sublineages)
-    #print(muts)
+    # print(muts)
     freqs = freqperlineage(muts, alllin)
-    #print(freqs)
+    # print(freqs)
     (s, o, r) = rank(su, freqs, limit=low)
-    #print(s,o,r)
+    # print(s,o,r)
 
     fi = [i for i in freqs.items()]
     # print({p:fi[p-1] for p in [s,o,r]})

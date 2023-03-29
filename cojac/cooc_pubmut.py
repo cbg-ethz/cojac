@@ -98,7 +98,11 @@ import click
 def cooc_pubmut(
     vocdir, amp, json_fname, yaml_fname, csv_fname, escape, semi, batchname, quiet
 ):
-    escape = ("\\n", csv.QUOTE_NONNUMERIC, "\\") if escape else ("\n", csv.QUOTE_MINIMAL, None)
+    escape = (
+        ("\\n", csv.QUOTE_NONNUMERIC, "\\")
+        if escape
+        else ("\n", csv.QUOTE_MINIMAL, None)
+    )
 
     # TODO make the "header prettification" code more generic and share with colourmut
 

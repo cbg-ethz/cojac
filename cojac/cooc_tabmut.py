@@ -188,7 +188,6 @@ def cooc_tabmut(
             )  # , inplace=True)
     # rstudio_table_df.index.rename('sample', inplace=True)
 
-
     if not quiet:
         with pd.option_context(
             "display.max_rows", None
