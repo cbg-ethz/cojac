@@ -1,0 +1,50 @@
+variant:
+  short: 'be'
+  who: 'beta'
+  pangolin: 'B.1.351'
+  nextstrain: '20H/501Y.V2'
+  voc: 'VOC-202012/02'
+source:
+  - doi:10.1101/2020.12.21.20248640
+  - https://www.gov.uk/government/publications/investigation-of-novel-sars-cov-2-variant-variant-of-concern-20201201#attachment_4970549
+threshold: 4
+  # or 5 out of 9 (*)
+mut:
+  174: 'G>T'
+  241: 'C>T'
+  1059: 'C>T' # ORF1ab:T265I
+  3037: 'C>T'
+  5230:  'G>T' # ORF1ab:K1655N (*)
+  10323: 'A>G' # ORF1ab:K3353R
+  11288: '-----'  # see below:
+  #actually, due to repeated 'T's flanking the region, can be any of these:
+  #11284: '---------' # ORF1ab:SGF3675del
+  #11288: '---------' # ORF1ab:SGF3675del
+  14408: 'C>T' # ORF1ab:P4715L
+  21801: 'A>C' # S:D80A (*)
+  22206: 'A>G' # D215G 'not fixed', but determining(*) in source 2
+
+  22287: '---' # see below:
+  #actually, due to repeated 'CTTTAC' motive, can be any of these:
+  #22281: '---------' <- left-most possibility
+  #22283: '---------' <- covspectrum
+  #22286: '---------' <- original pub 'not fixed & un-resolved'
+  #22287: '---------' <- right-most
+  # phegenomics seems wrong due to this causing a mutation 22280: A>C
+  #22280: '---------' <-
+
+  22813: 'G>T' # S:K417N !RBD (*), but source 2 calls it non-determining
+  23012: 'G>A' # S:E484K !RBD
+  23063: 'A>T' # S:N501Y !RBD
+  23403: 'A>G' # S:D614G
+  23664: 'C>T' # S:A701V
+  25563: 'G>T' # ORF3a:Q57H
+  25904: 'C>T' # ORF3a:S171L
+  26456: 'C>T' # E:P71L (*)
+  28253: 'C>T'
+  28887: 'C>T' # N:T205I (*)
+
+#revert:
+  ## Used by nextclade
+  # 8782: 'C'
+

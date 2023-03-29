@@ -243,9 +243,9 @@ Select a directory containing a collection of virus definitions YAMLs using the 
 # fetch the repository of standardised variant definitions
 git clone https://github.com/phe-genomics/variant_definitions.git
 # generate a YAML for omicron subvariant BA.2 using the corresponding standardised variant definitions
-phe2cojac --shortname 'om2' --yaml voc/omicron_ba2_mutations.yaml variant_definitions/variant_yaml/imagines-viewable.yml
+cojac phe2cojac --shortname 'om2' --yaml voc/omicron_ba2_mutations.yaml variant_definitions/variant_yaml/imagines-viewable.yml
 # now have a look at the frequencies of mutations using CoV-Spectrum
-cooc-curate voc/omicron_ba2_mutations.yaml
+cojac cooc-curate voc/omicron_ba2_mutations.yaml
 # adjust the content of the YAML files to your needs
 ```
 
@@ -422,7 +422,7 @@ You can install _cojac_ in its own environment and activate it:
 conda create -n cojac cojac
 conda activate cojac
 # test it
-cojac cooc-mutbamscan --help
+cojac --help
 ```
 
 And to update it to the latest version, run:
@@ -461,7 +461,7 @@ cojac should now be accessible from your PATH
 ```bash
 # activate the environment if not already active:
 conda activate cojac
-cojac cooc-mutbamscan --help
+cojac --help
 ```
 
 ### Remove conda environment
@@ -525,11 +525,11 @@ Long term goal:
 
 If you use this software in your research, please cite:
 
-- Katharina Jahn, David Dreifuss, Ivan Topolsky, Anina Kull, Pravin Ganesanandamoorthy, Xavier Fernandez-Cassi, Carola Bänziger, Elyse Stachler, Lara Fuhrmann, Kim Philipp Jablonski, Chaoran Chen, Catharine Aquino, Tanja Stadler, Christoph Ort, Tamar Kohn, Timothy R. Julian, Niko Beerenwinkel
+- Katharina Jahn, David Dreifuss, Ivan Topolsky, Anina Kull, Pravin Ganesanandamoorthy, Xavier Fernandez-Cassi, Carola Bänziger, Alexander J. Devaux, Elyse Stachler, Lea Caduff, Federica Cariti, Alex Tuñas Corzón, Lara Fuhrmann, Chaoran Chen, Kim Philipp Jablonski, Sarah Nadeau, Mirjam Feldkamp, Christian Beisel, Catharine Aquino, Tanja Stadler, Christoph Ort, Tamar Kohn, Timothy R. Julian & Niko Beerenwinkel
 
-  "*Detection of SARS-CoV-2 variants in Switzerland by genomic analysis of wastewater samples*."
+  "*Early detection and surveillance of SARS-CoV-2 genomic variants in wastewater using COJAC*."
 
-  medRxiv 2021.01.08.21249379; [doi:10.1101/2021.01.08.21249379](https://doi.org/10.1101/2021.01.08.21249379)
+  Nature Microbiology volume 7, pages 1151–1160 (2022); [doi:10.1038/s41564-022-01185-x](https://doi.org/10.1038/s41564-022-01185-x)
 
 ## Contacts
 

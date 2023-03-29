@@ -9,20 +9,38 @@ source:
 - https://github.com/cov-lineages/pango-designation/issues/49
 threshold: 4
 mut:
-  # S
+  210: 'G>T'
+  241: 'C>T'
+  3037: 'C>T'
+  4181: 'G>T'
+  6402: 'C>T'
+  7124: 'C>T'
+  8986: 'C>T'
+  9053: 'G>T'
+  10029: 'C>T'
+  11201: 'A>G'
+  11332: 'A>G'
+  14408: 'C>T'
+  15451: 'G>A'
+  16466: 'C>T'
+  19220: 'C>T'
   21618: 'C>G' # surface glycoprotein:T19R
+  21987: 'G>A'
+  22029: '------'
   22917: 'T>G' # surface glycoprotein:L452R
   22995: 'C>A' # surface glycoprotein:T478K
+  23403: 'A>G'
   23604: 'C>G' # surface glycoprotein:P681R
   24410: 'G>A' # surface glycoprotein:D950N
-  # ORF3a
   25469: 'C>T' # ORF3a protein:S26L
-  # M
   26767: 'T>C' # membrane glycoprotein:I82T
-  # ORF7a
   27638: 'T>C' # ORF7a protein:V82A
   27752: 'C>T' # ORF7a protein:T120I
-  # N
+  27874: 'C>T'
+  28248: '------'
+  28271: '-'
   28461: 'A>G' # nucleocapsid phosphoprotein:D63G
   28881: 'G>T' # nucleocapsid phosphoprotein:R203M
+  28916: 'G>T'
   29402: 'G>T' # nucleocapsid phosphoprotein:D377Y
+  29742: 'G>T'

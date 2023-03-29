@@ -12,21 +12,24 @@ source:
   - https://www.telegraphindia.com/india/covid-double-mutation-variant-fuels-fears/cid/1809715
 threshold: 5
 mut:
-  # ORF1ab
-  3457: 'C>T' # syn nsp3
-  4965: 'C>T' # nsp3:T749I
-  11201: 'A>G' # nsp6:T77A
-  17523: 'G>T' # nsp13:M429I
-  20396: 'A>G' # nsp15:K259R
-  # S
-  #21895: 'T>C' # syn
-  #22022: 'G>A' # E154K
+  210: 'G>T'
+  241: 'C>T'
+  3037: 'C>T'
+  3457: 'C>T' # ORF1ab:syn nsp3
+  4965: 'C>T' # ORF1ab:nsp3:T749I
+  11201: 'A>G' # ORF1ab:nsp6:T77A
+  14408: 'C>T'
+  17523: 'G>T' # ORF1ab:nsp13:M429I
+  20396: 'A>G' # ORF1ab:nsp15:K259R
+  21895: 'T>C' # syn
+  22022: 'G>A' # S:E154K
   22917: 'T>G' # surface glycoprotein:L452R
   23012: 'G>C' # surface glycoprotein:E484Q
+  23403: 'A>G'
   23604: 'C>G' # surface glycoprotein:P681R
-  # ORF3a
+  24775: 'A>T'
   25469: 'C>T' # ORF3a protein:S26L
-  # ORF7a
   27638: 'T>C' # ORF7a protein:V82A
-  # N
   28881: 'G>T' # nucleocapsid phosphoprotein:R203M
+  29402: 'G>T'
+  29742: 'G>T'

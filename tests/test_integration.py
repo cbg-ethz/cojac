@@ -60,9 +60,9 @@ def test_workflow():
             "cooc-curate",
             "-a",
             "amplicons.v3.yaml",
-            "voc/omicron_ba2_mutations.yaml",
-            "voc/omicron_ba1_mutations.yaml",
-            "voc/delta_mutations.yaml",
+            "voc/omicron_ba2_mutations_full.yaml",
+            "voc/omicron_ba1_mutations_full.yaml",
+            "voc/delta_mutations_full.yaml",
         ]
     )
     subprocess.check_call(

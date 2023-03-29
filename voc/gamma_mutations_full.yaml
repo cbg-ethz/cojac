@@ -1,0 +1,47 @@
+variant:
+  short: 'ga'
+  who: 'gamma'
+  pangolin: 'P.1'
+  nextstrain: '20J/501Y.V3'
+  voc: 'VOC-202101/02'
+source:
+  - https://virological.org/t/genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-manaus-preliminary-findings/586
+  - doi:10.1101/2021.02.26.21252554
+  - https://www.gov.uk/government/publications/investigation-of-novel-sars-cov-2-variant-variant-of-concern-20201201#attachment_4970549
+threshold: 5
+mut:
+  241: 'C>T'
+  733:  'T>C' # syn
+  2749: 'C>T' # syn
+  3037: 'C>T'
+  3828: 'C>T' # ORF1ab:S1188L
+  5648: 'A>C' # ORF1ab:K1795Q
+  6319: 'A>G'
+  6613: 'A>G'
+  11288: '-----'  # see below:
+  #actually, due to repeated 'T's flanking the region, can be any of these:
+  #11284: '---------' # SGF3675del
+  #11288: '---------' # SGF3675del
+  12778: 'C>T' # syn
+  13860: 'C>T' # syn
+  14408: 'C>T'
+  17259: 'G>T' # ORF1ab:E5665D
+  21614: 'C>T' # S:L18F
+  21621: 'C>A' # S:T20N
+  21638: 'C>T' # S:P26S
+  21974: 'G>T' # S:D138Y
+  22132: 'G>T' # S:R190S
+  22812: 'A>C' # S:K417T !RBD
+  23012: 'G>A' # S:E484K !RBD
+  23063: 'A>T' # S:N501Y !RBD
+  23403: 'A>G'
+  23525: 'C>T' # S:H655Y
+  24642: 'C>T' # S:T1027I
+  25088: 'G>T' # S/1176F
+  26149: 'T>C' # ORF3A/253P
+  28167: 'G>A' # ORF8:E92K
+  28263: '+AACA'
+  28512: 'C>G' # N:P80R
+  28877: 'AG>TC' # N:syn
+  28881: 'GGG>AAC'
+  29834: 'T>A'
