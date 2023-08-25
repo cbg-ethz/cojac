@@ -32,6 +32,7 @@ def setURL(url):
     - https://lapis.cov-spectrum.org/gisaid/v1 : GISAID sequences
     Note: Acess keys are mandatory on non-open end-points
     """
+    global server
     server = url
 
 
