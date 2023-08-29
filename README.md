@@ -4,10 +4,12 @@
 [![Bioconda package](https://img.shields.io/conda/dn/bioconda/cojac.svg?label=Bioconda)](https://bioconda.github.io/recipes/cojac/README.html)
 [![Docker container](https://quay.io/repository/biocontainers/cojac/status)](https://quay.io/repository/biocontainers/cojac)
 
+The COJAC tool is part of the [V-pipe workflow for analysing NGS data of short viral genomes](https://github.com/cbg-ethz/v-pipe).
+
 ## Description
 
 The _cojac_ package comprises a set of command-line tools to analyse co-occurrence of mutations on amplicons. It is useful, for example, for early detection of viral variants of concern (e.g. Alpha, Delta, Omicron) in environmental samples, and has been designed to scan for multiple SARS-CoV-2 variants in wastewater samples, as analyzed jointly by [ETH Zurich](https://bsse.ethz.ch/news-and-events/d-bsse-news/2021/01/sars-cov-2-variants-detected-in-wastewater-samples.html), [EPFL](https://actu.epfl.ch/news/covid-19-using-wastewater-to-track-the-pandemic/) and [Eawag](https://www.eawag.ch/en/department/sww/projects/sars-cov2-in-wastewater/).
-Learn more about this project on [its Dashboard](https://bsse.ethz.ch/cbg/research/computational-virology/sarscov2-variants-wastewater-surveillance.html), amplicon cooccurrences measured with _cojac_ are visualized on the heatmaps available on per-station or per-variant subpages [displayed on CoV-Spectrum](https://cov-spectrum.ethz.ch/story/wastewater-in-switzerland).
+Learn more about this project on [its Dashboard](https://cov-spectrum.ethz.ch/story/wastewater-in-switzerland).
 
 The analysis requires the whole amplicon to be covered by sequencing read pairs. It currently works at the level of aligned reads, but [we plan](#upcoming-features) to be able to adjust confidence scores based on local (window) haplotypes (as generated, e.g., by [ShoRAH](https://github.com/cbg-ethz/shorah), [doi:10.1186/1471-2105-12-119](https://doi.org/10.1186/1471-2105-12-119)).
 
@@ -22,7 +24,7 @@ Here are the available command-line tools:
 | `cojac cooc-pubmut`     | render a JSON or YAML file to a table as in the publication |
 | `cojac cooc-tabmut`     | export a JSON or YAML file as a CSV/TSV table for downstream analysis (e.g.: RStudio) |
 | `cojac cooc-curate`     | an (experimental) tool to assist evaluating the quality of variant definitions by looking at mutations' or cooccurences' frequencies from [CoV-Spectrum](cov-spectrum.org) |
-| `cojac phe2cojac`       | a tool to generate new variant definition YAMLs for cojac using YMLs available at [PHE Genomic's _Standardised Variant Definitions_](https://github.com/phe-genomics/variant_definitions) |
+| `cojac phe2cojac`       | a tool to generate new variant definition YAMLs for cojac using YMLs available at [UK Health Security Agency (UKHSA) _Standardised Variant Definitions_](https://github.com/ukhsa-collaboration/variant_definitions/) |
 | `cojac sig-generate`    | a tool to generate list of mutations by querying [CoV-Spectrum](https://lapis.cov-spectrum.org/) and assist writing variant definition YAMLs for cojac |
 
 Use option `-h` / `--help` to see available command-line options:
@@ -238,10 +240,10 @@ Select a directory containing a collection of virus definitions YAMLs using the 
 
 > **Note:**
 > - you can create new YAML files if you need to look for new variants of concern.
-> - e.g. it is possible to automatically generate YAMLs for cojac from  [PHE Genomic's _Standardised Variant Definitions_](https://github.com/phe-genomics/variant_definitions):
+> - e.g. it is possible to automatically generate YAMLs for cojac from [UK Health Security Agency (UKHSA) _Standardised Variant Definitions_](https://github.com/ukhsa-collaboration/variant_definitions/):
 ```bash
 # fetch the repository of standardised variant definitions
-git clone https://github.com/phe-genomics/variant_definitions.git
+git clone https://github.com/ukhsa-collaboration/variant_definitions.git
 # generate a YAML for omicron subvariant BA.2 using the corresponding standardised variant definitions
 cojac phe2cojac --shortname 'om2' --yaml voc/omicron_ba2_mutations.yaml variant_definitions/variant_yaml/imagines-viewable.yml
 # now have a look at the frequencies of mutations using CoV-Spectrum
@@ -401,14 +403,14 @@ Another different table orientation is provided by `-l`/`--lines`:
 We recommend using [bioconda software repositories](https://bioconda.github.io/index.html) for easy installation.
 You can find instruction to setup your bioconda environment at the following address:
 
- - https://bioconda.github.io/user/install.html
+ - https://bioconda.github.io/index.html#usage
 
-In those instructions, please follow carefully the [section _2. Set up channels_](https://bioconda.github.io/user/install.html#set-up-channels).
+In those instructions, please follow carefully the channel configuration instructions.
 
 If you use [V-pipe’s `quick_install.sh`](https://github.com/cbg-ethz/V-pipe#using-quick-install-script), it will set up an environment that you can activate, e.g.:
 
 ```bash
-bash quick_install.sh -b sars-cov2 -p testing -w work
+bash quick_install.sh -b master -p testing -w work
 . ./testing/miniconda3/bin/activate
 ```
 
