@@ -17,7 +17,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 
 
 #
-# CoV-Spectrum pico-API
+# covSPECTRUM pico-API
 #
 
 
@@ -275,7 +275,7 @@ def curate_muts(
 
 
 @click.command(
-    help="Helps determining specific mutations and cooccurences by querying CoV-Spectrum",
+    help="Helps determining specific mutations and cooccurences by querying covSPECTRUM",
     epilog="This tool queries LAPIS, see https://lapis-docs.readthedocs.io/en/latest/",
 )
 @click.option(

@@ -9,7 +9,7 @@ The COJAC tool is part of the [V-pipe workflow for analysing NGS data of short v
 ## Description
 
 The _cojac_ package comprises a set of command-line tools to analyse co-occurrence of mutations on amplicons. It is useful, for example, for early detection of viral variants of concern (e.g. Alpha, Delta, Omicron) in environmental samples, and has been designed to scan for multiple SARS-CoV-2 variants in wastewater samples, as analyzed jointly by [ETH Zurich](https://bsse.ethz.ch/news-and-events/d-bsse-news/2021/01/sars-cov-2-variants-detected-in-wastewater-samples.html), [EPFL](https://actu.epfl.ch/news/covid-19-using-wastewater-to-track-the-pandemic/) and [Eawag](https://www.eawag.ch/en/department/sww/projects/sars-cov2-in-wastewater/).
-Learn more about this project on [its Dashboard](https://cov-spectrum.ethz.ch/story/wastewater-in-switzerland).
+Learn more about this project on [its Dashboard](https://cov-spectrum.org/story/wastewater-in-switzerland).
 
 The analysis requires the whole amplicon to be covered by sequencing read pairs. It currently works at the level of aligned reads, but [we plan](#upcoming-features) to be able to adjust confidence scores based on local (window) haplotypes (as generated, e.g., by [ShoRAH](https://github.com/cbg-ethz/shorah), [doi:10.1186/1471-2105-12-119](https://doi.org/10.1186/1471-2105-12-119)).
 
@@ -23,9 +23,9 @@ Here are the available command-line tools:
 | `cojac cooc-colourmut`  | display a JSON or YAML file as a coloured output on the terminal |
 | `cojac cooc-pubmut`     | render a JSON or YAML file to a table as in the publication |
 | `cojac cooc-tabmut`     | export a JSON or YAML file as a CSV/TSV table for downstream analysis (e.g.: RStudio) |
-| `cojac cooc-curate`     | an (experimental) tool to assist evaluating the quality of variant definitions by looking at mutations' or cooccurences' frequencies from [CoV-Spectrum](cov-spectrum.org) |
+| `cojac cooc-curate`     | an (experimental) tool to assist evaluating the quality of variant definitions by looking at mutations' or cooccurences' frequencies from [covSPECTRUM](https://cov-spectrum.org) |
 | `cojac phe2cojac`       | a tool to generate new variant definition YAMLs for cojac using YMLs available at [UK Health Security Agency (UKHSA) _Standardised Variant Definitions_](https://github.com/ukhsa-collaboration/variant_definitions/) |
-| `cojac sig-generate`    | a tool to generate list of mutations by querying [CoV-Spectrum](https://lapis.cov-spectrum.org/) and assist writing variant definition YAMLs for cojac |
+| `cojac sig-generate`    | a tool to generate list of mutations by querying [covSPECTRUM](https://lapis.cov-spectrum.org/) and assist writing variant definition YAMLs for cojac |
 
 Use option `-h` / `--help` to see available command-line options:
 
@@ -184,7 +184,7 @@ $ cojac sig-generate --help
 Usage: cojac  sig-generate [OPTIONS]
 
   Helps generating a list of mutations frequently found in a variant by
-  querying CoV-Spectrum
+  querying covSPECTRUM
 
 Options:
   -u, --url URL           url to use when contact covspectrum (e.g.
@@ -234,26 +234,52 @@ Select the desired bedfile using the `-b` / `--bedfile` option.
 
 Analysis will use variants description YAML that list mutation to be searched.
 
-We provide several examples in the directory [`voc/`](voc/).
+We provide several examples in the directory [`voc/`](voc/). The current variants' mutation lists that we use in production as part of our wastewater-based surveillance of SARS-CoV-2 variants can be found in the repository [COWWID](https://github.com/cbg-ethz/cowwid), in the subdirectory [`voc/`](https://github.com/cbg-ethz/cowwid/tree/master/voc).
 
-Select a directory containing a collection of virus definitions YAMLs using the `-m` / `--vocdir` option.
+Select a directory containing a collection of virus definitions YAMLs using the `-m` / `--vocdir` option, or list individual YAML file(s) with option `--voc`.
 
 > **Note:**
 > - you can create new YAML files if you need to look for new variants of concern.
-> - e.g. it is possible to automatically generate YAMLs for cojac from [UK Health Security Agency (UKHSA) _Standardised Variant Definitions_](https://github.com/ukhsa-collaboration/variant_definitions/):
+> - e.g. it is possible to automatically generate YAMLs listing a few key mutations for cojac from [UK Health Security Agency (UKHSA) _Standardised Variant Definitions_](https://github.com/ukhsa-collaboration/variant_definitions/):
 ```bash
 # fetch the repository of standardised variant definitions
 git clone https://github.com/ukhsa-collaboration/variant_definitions.git
 # generate a YAML for omicron subvariant BA.2 using the corresponding standardised variant definitions
 cojac phe2cojac --shortname 'om2' --yaml voc/omicron_ba2_mutations.yaml variant_definitions/variant_yaml/imagines-viewable.yml
-# now have a look at the frequencies of mutations using CoV-Spectrum
+# now have a look at the frequencies of mutations using covSPECTRUM
 cojac cooc-curate voc/omicron_ba2_mutations.yaml
 # adjust the content of the YAML files to your needs
+```
+> - Another possibility is obtaining an exhausive list of mutations from covSpectrum or [covariants.org's repository](https://github.com/hodcroftlab/covariants/tree/master/defining_mutations)
+```bash
+# display the exhaustive list of all mutations known to appear on Omicron BA.1 on covSPECTRUM:
+cojac sig-generate --url https://lapis.cov-spectrum.org/open/v1 --variant BA.1 | tee list_ba1.yaml
+
+# or, Alternatively, download the TSV from covariants.org's repo and extract the list:
+curl -O 'https://raw.githubusercontent.com/hodcroftlab/covariants/master/defining_mutations/21K.Omicron.tsv'
+cojac sig-generate --covariants 21K.Omicron.tsv --variant 'BA.1' | tee list_ba1.yaml
+
+# add a YAML header to the list:
+# (at minimum you NEED to specify the 'pangolin' lineage and give it a 'short' handle)
+# (source and 'nextstrain' lineages are optional)
+cat - list_ba1.yaml > voc/omicron_ba1_mutations_full.yaml <<HEAD
+variant:
+  short: 'om1'
+  nextstrain: '21K'
+  pangolin: 'BA.1'
+source:
+- https://github.com/cov-lineages/pango-designation/issues/361
+- https://github.com/hodcroftlab/covariants/blob/master/defining_mutations/21K.Omicron.tsv
+mut:
+HEAD
+
+# now have a look at the frequencies of mutations using covSPECTRUM
+cojac cooc-curate voc/omicron_ba2_mutations_full.yaml
 ```
 
 ### Collect the co-occurrence data
 
-There are currently two modes to collect the data about co-occurring mutations in reads: analysing stand-alone BAM/CRAM/SAM alignment files, or analysing the output of a cohort analysed with [V-pipe](https://cbg-ethz.github.io/V-pipe/) ([doi:10.1093/bioinformatics/btab015](https://doi.org/10.1093/bioinformatics/btab015)).
+If you're not executing COJAC as part of a larger workflow, such as [V-pipe](https://github.com/cbg-ethz/v-pipe), you can analyse stand-alone BAM/CRAM/SAM alignment files.
 
 #### Standalone files
 
@@ -263,19 +289,20 @@ Provide a list of BAM files using the `-a` / `--alignment` option. Run:
 cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -a sam1.bam sam2.bam -j cooc-test.json
 ```
 
-> **Note:** you can also use the `-y` / `--yaml` option to write to a YAML file instead of a JSON.
+> **Note:**
+> - you can also use the `-y` / `--yaml` option to write to a YAML file instead of a JSON.
+> - as an optimisation tip of your workflow, try running one separate instance of COJAC on each BAM file,
+>   and combining the results afterward in a single YAML (or JSON).
 
-#### Analyzing a cohort with V-pipe
+#### Analyzing a cohort previously aligned by V-pipe
 
-You can learn how to analyse _fastq.gz_ files with V-pipe with this tutorial:
-
- - https://cbg-ethz.github.io/V-pipe/tutorial/sars-cov2/ ([video tutorial](https://youtu.be/pIby1UooK94))
-
-Run:
+Before the integration of COJAC to V-pipe, this was the legacy method for analysing alignments produced by V-pipe.
 
 ```bash
 cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -t work/samples.tsv -p work/samples/ -j cooc-test.json
 ```
+
+> ***Note:** Warning, it is much slower as each alignment is analyzed sequentially.
 
 #### Number of cooccurences
 
@@ -288,16 +315,19 @@ By default `cooc-mutbamscan` will look for cooccurrences of at least 2 mutations
 
 Using the `-A` / `--out-amp` / `--out-amplicons` option, it is possible to store the exact request that was used to analyze samples.
 You can then re-use the exact same request using the `-Q` / `--in-amp` / `--amplicons` option, or pass it to a visualisation tool.
+This is useful for sharing the exact same request accross multiple parallel COJAC instances (e.g.: one per BAM file).
 
 ```bash
 # store the request in a YAML file
 cojac cooc-mutbamscan -b nCoV-2019.insert.V3.bed -m voc/ -A amplicons.v3.yaml
 # adjust the content of amplicons.v3.yaml
 
-# now have a look at the frequencies of mutation cooccurences using CoV-Spectrum
+# now have a look at the frequencies of mutation cooccurences using covSPECTRUM
 cojac cooc-curate -a amplicons.v3.yaml voc/omicron_ba2_mutations.yaml voc/omicron_ba1_mutations.yaml voc/delta_mutations.yaml
 # reuse the amplicon
-cojac cooc-mutbamscan -Q amplicons.v3.yaml -a sam1.bam sam2.bam -j cooc-test.json
+cojac cooc-mutbamscan -Q amplicons.v3.yaml -a sam1.bam -y cooc-sam1.yaml
+cojac cooc-mutbamscan -Q amplicons.v3.yaml -a sam2.bam -y cooc-sam2.yaml
+cat cooc-sam1.yaml cooc-sam2.yaml > cooc-test.yaml
 ```
 
 ### Display data on terminal
