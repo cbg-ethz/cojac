@@ -232,7 +232,9 @@ def bed_load(bedfile):
     """
 
     amp_bed = pd.read_table(
-        bedfile, names=["ref", "start", "stop", "amp_num", "pool", "strand"]
+        bedfile,
+        index_col=False,
+        names=["ref", "start", "stop", "amp_num", "pool", "strand"],
     )
     # make query start and query end for each amplicon
     amp_bed["qstart"] = (
@@ -287,7 +289,7 @@ def make_all_amplicons(bedfile, vocs, revert=False, n_cooc=2):
         #  - G23012A  E484K
         #  - A23063T  N501Y
         # both on Spike's RBD
-        for (k1, d1) in list(amp_dict.items()):  # WARNING inefficient but functional
+        for k1, d1 in list(amp_dict.items()):  # WARNING inefficient but functional
             ampname = k1.split("_")[0]
             for k2, d2 in list(amplicons.items()):
                 npart = k2.split("_")

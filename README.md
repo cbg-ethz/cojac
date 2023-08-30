@@ -224,6 +224,16 @@ We provide BED files for the following examples:
  - [nCoV-2019.insert.V3.bed](nCoV-2019.insert.V3.bed) for [ARTIC V3](https://doi.org/10.17504/protocols.io.bibtkann)
  - [SARS-CoV-2.insert.V4.txt](SARS-CoV-2.insert.V4.txt) for [ARTIC V4](https://community.artic.network/t/sars-cov-2-version-4-scheme-release/312)
 
+> **Note:**
+> - if you have a BED file describing the *primers' target binding region*, it's possible to convert it into an BED *inserts* using the tool [viramp-hub](https://github.com/wm75/viramp-hub):
+```bash
+# download the *primer* BED file for Artic v5.3.2
+curl -o SARS-CoV-2.v532.primer.bed 'https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/V5.3.2/SARS-CoV-2.primer.bed'
+# convert it into an *insert* BED file
+scheme-convert SARS-CoV-2.v532.primer.bed --to bed --bed-type cojac -o SARS-CoV-2.v532.cojac_insert.bed
+```
+> - for an useful application of *primer* BED files to searching for possible drop-outs, see [section _Mutations affecting primers_ below](#mutations-affecting-primers).
+
 These protocols produces ~400bp long amplicons, and thus needs to be sequenced with, e.g., paired end sequencing with read length 250.
 
 Select the desired bedfile using the `-b` / `--bedfile` option.
@@ -341,7 +351,7 @@ cojac cooc-colourmut -a amplicons.v3.yaml -j cooc-test.json
 ![terminal screen shot](images/terminal.svg)
 
 > **Notes:**
-> - passing the `-a` / `--amplicons` parameter is currenlty mandatory, see [section _Store the amplicon query_ above](#store_the_amplicon_query)
+> - passing the `-a` / `--amplicons` parameter is currenlty mandatory, see [section _Store the amplicon query_ above](#store-the-amplicon-query)
 
 ### Render table for publication
 
@@ -426,6 +436,32 @@ Another different table orientation is provided by `-l`/`--lines`:
 | sam2.bam |       93 | 0.148225 |    2 |   958 |     142 |          80 |  1 |
 | sam2.bam |       76 | 0.000000 |    2 |  1005 |       0 |           0 |    |  1 |
 | sam2.bam |       77 | 1.000000 |    1 |  1615 |    1615 |           0 |    |    |  1 |
+
+### Mutations affecting primers
+
+It is also possible to abuse the sub-command shown in [section _Store the amplicon query_ above](#store-the-amplicon-query) to get a list of mutations which fall on primers' target sites (and thus could impact binding and cause drop-outs) by providing a *primer* BED file.
+
+```bash
+# get the *primer* BED file for Artic v5.3.2
+curl -o SARS-CoV-2.v532.primer.bed 'https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/V5.3.2/SARS-CoV-2.primer.bed'
+# get the full list of Omicron BA.2.86 mutations
+curl -O 'https://raw.githubusercontent.com/cbg-ethz/cowwid/master/voc/omicron_ba286_mutations_full.yaml'
+
+# check which primers have at least 1 mutation falling in their target binding regions
+cojac cooc-mutbamscan --voc omicron_ba286_mutations_full.yaml --bedfile SARS-CoV-2.v532.primer.bed --cooc 1 --out-amp affected_primers.v532.yaml
+```
+
+
+This will yields entries like:
+```yaml
+50_ombba286: [7819, 7850, 7512, 7738, {7842: G}]
+```
+
+meaning:
+- [50th line of the BED file](https://github.com/artic-network/primer-schemes/blob/master/nCoV-2019/V5.3.2/SARS-CoV-2.primer.bed#L50)
+- primer's target binding region 7819-7850
+- (that would be primer "SARS-CoV-2_25_RIGHT" with sequence `CTCTCAGGTTGTCTAAGTTAACAAAATGAGA`)
+- is hit by one mutation `7842G`
 
 
 ## Installation
