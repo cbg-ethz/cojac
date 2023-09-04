@@ -157,7 +157,7 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name="", cooc=2):
     Returns:
             amplicons_dict: dict() with entries of the form:
                     *amplicon_number*_*voc_name* : [start, stop, {position1 : mutation1, position2 : mutation2 , ...}]
-                    for each amplicon where cooccurences could be found
+                    for each amplicon where cooccurrences could be found
     """
     mut_df = pd.DataFrame({"position": mut_dict.keys(), "mutation": mut_dict.values()})
     amplicons_dict = {}
@@ -490,7 +490,7 @@ def write_all_amplicons(amplicons, outamp, amp_bed=None):
     required=False,
     default=2,
     type=int,
-    help="minimum number of cooccurences to search for",
+    help="minimum number of cooccurrences to search for",
 )
 # TODO: use mutually exclusive groups
 @click.option(
@@ -530,7 +530,7 @@ def write_all_amplicons(amplicons, outamp, amp_bed=None):
     required=False,
     default=None,
     type=str,
-    help="output results to as JSON file",
+    help="output results to a JSON file",
 )
 @click.option(
     "-y",
@@ -540,7 +540,7 @@ def write_all_amplicons(amplicons, outamp, amp_bed=None):
     required=False,
     default=None,
     type=str,
-    help="output results to as yaml file",
+    help="output results to a yaml file",
 )
 @click.option(
     "-t",
@@ -549,7 +549,7 @@ def write_all_amplicons(amplicons, outamp, amp_bed=None):
     required=False,
     default=None,
     type=str,
-    help="output results to as (raw) tsv file",
+    help="output results to a (raw) tsv file",
 )
 @click.option(
     "-d",

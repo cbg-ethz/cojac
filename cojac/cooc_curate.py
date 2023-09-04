@@ -189,7 +189,7 @@ def freqperlineage(mutations, lineages):
 
 
 def rank(sublineages, freqs, limit=0.05):
-    """find ranks of occurence of:
+    """find ranks of occurrence of:
     - last sublineages still part of the seeked lineages
     - first other lineages which is not part of the seeked one
     - last member still above the limit
@@ -275,7 +275,7 @@ def curate_muts(
 
 
 @click.command(
-    help="Helps determining specific mutations and cooccurences by querying covSPECTRUM",
+    help="Helps determining specific mutations and cooccurrences by querying covSPECTRUM",
     epilog="This tool queries LAPIS, see https://lapis-docs.readthedocs.io/en/latest/",
 )
 @click.option(
@@ -285,7 +285,7 @@ def curate_muts(
     required=False,
     default=None,
     type=str,
-    help="url to use when contact covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
 )
 @click.option(
     "-a",
@@ -325,7 +325,7 @@ def curate_muts(
     "--collapse/--no-collapse",
     required=False,
     default=True,
-    help="combine counts of all sublineages together and consider a signle value that corresponds to a lineages family (e.g.: count all B.1.612.2* together). This is especially useful for assessing signature of old variants that have branched out by now.",
+    help="combine counts of all sublineages together and consider a single value that corresponds to a lineages family (e.g.: count all B.1.612.2* together). This is especially useful for assessing signatures of old variants that have branched out by now.",
 )
 @click.option(
     "--colour/--no-colour",

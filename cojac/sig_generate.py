@@ -27,7 +27,7 @@ parsenuc = re.compile(
     required=False,
     default=None,
     type=str,
-    help="url to use when contact covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
 )
 @click.option(
     "--var",
@@ -64,7 +64,7 @@ parsenuc = re.compile(
     metavar="FREQ",
     default=None,
     type=float,
-    help="Use a different minimum frequency for deletions (useful early on when there are few sequences and some of those were produced by pipeline that don't handle deletions)",
+    help="Use a different minimum frequency for deletions (useful early on when there are few sequences and some of those were produced by pipelines that don't handle deletions)",
 )
 @click.option(
     "-s",
