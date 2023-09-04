@@ -189,7 +189,7 @@ def make_amplicons_dict(amp_bed, mut_dict, voc_name="", cooc=2):
     return amplicons_dict
 
 
-def bed_load(bedfile):
+def bed_load(bedfile, sort=True):
     """function to load a bedfile and compute the pysam request parameters
 
     In samtools' libhts and in pysam if you request between the start and end of a window,
@@ -231,11 +231,19 @@ def bed_load(bedfile):
                    |---------| : request
     """
 
-    amp_bed = pd.read_table(
+    amp_bed_raw = pd.read_table(
         bedfile,
         index_col=False,
         names=["ref", "start", "stop", "amp_num", "pool", "strand"],
+        dtype={
+            "ref": "str",
+            "start": "uint32",
+            "stop": "uint32",
+            "amp_num": "str",
+        },
     )
+    amp_bed = amp_bed_raw.sort_values(by=["ref", "start"]) if sort else amp_bed_raw
+
     # make query start and query end for each amplicon
     amp_bed["qstart"] = (
         pd.concat([amp_bed["start"][0:1], amp_bed["stop"][:-1]]).reset_index(drop=True)
@@ -257,13 +265,10 @@ def bed_load(bedfile):
     return amp_bed
 
 
-def make_all_amplicons(bedfile, vocs, revert=False, n_cooc=2):
+def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2):
     """given a .BED file and a directory with YAMLs decribing VOCs,
     generates all amplicons to search that have at least n_cooc mutations
     """
-
-    # load bedfile
-    amp_bed = bed_load(bedfile)
 
     # load all voc yamls
     loaded_yamls = []
@@ -325,7 +330,23 @@ def load_all_amplicons(inamp):
         }
 
 
-def write_all_amplicons(amplicons, outamp):
+def add_name_comments(in_str, amp_bed):
+    out_str = ""
+    rxnum = re.compile(r"^\d+(?=_)")
+
+    n = None
+    for l in in_str.splitlines():
+        find_n = rxnum.match(l)
+        if find_n:
+            n = int(find_n.group(0))
+        if l[-1] == "]" and n is not None:
+            l += f" #\t{amp_bed['amp_num'][n - 1]}"
+        out_str += f"{l}\n"
+
+    return out_str
+
+
+def write_all_amplicons(amplicons, outamp, amp_bed=None):
     with open(outamp, "wt") as yf:
         # wrapper that force either flow style or block style
         class blockmap(dict):
@@ -348,19 +369,23 @@ def write_all_amplicons(amplicons, outamp):
         yaml.add_representer(flowseq, flowseq_rep)
 
         # type: force convert numpy numeric into standard YAML and python integers
-        print(
-            yaml.dump(
-                blockmap(
-                    {
-                        a: flowseq(
-                            [int(p) for p in q[:4]]
-                            + [{int(p): m for p, m in q[4].items()}]
-                        )
-                        for a, q in amplicons.items()
-                    }
-                ),
-                sort_keys=False,
+        yaml_str = yaml.dump(
+            blockmap(
+                {
+                    a: flowseq(
+                        [int(p) for p in q[:4]] + [{int(p): m for p, m in q[4].items()}]
+                    )
+                    for a, q in amplicons.items()
+                }
             ),
+            sort_keys=False,
+        )
+
+        if amp_bed is not None:
+            yaml_str = add_name_comments(yaml_str, amp_bed)
+
+        print(
+            yaml_str,
             file=yf,
         )
 
@@ -453,6 +478,12 @@ def write_all_amplicons(amplicons, outamp):
     help="bedfile defining the amplicons, with format: ref\\tstart\\tstop\\tamp_num\\tpool\\tstrand",
 )
 @click.option(
+    "--sort/--no-sort",
+    "sort",
+    default=True,
+    help="sort the bedfile by 'reference name' and 'start position' (default: sorted)",
+)
+@click.option(
     "-#",
     "--cooc",
     metavar="COOC",
@@ -484,6 +515,12 @@ def write_all_amplicons(amplicons, outamp):
     default=None,
     type=str,
     help="output amplicon query in a YAML file",
+)
+@click.option(
+    "--comment/--no-comment",
+    "comment",
+    default=True,
+    help="add comments in the out amplicon YAML with names from BED file (default: comment the YAML)",
 )
 @click.option(
     "-j",
@@ -531,9 +568,11 @@ def cooc_mutbamscan(
     voc,
     revert,
     bedfile,
+    sort,
     cooc,
     inamp,
     outamp,
+    comment,
     json_fname,
     yaml_fname,
     tsv,
@@ -556,10 +595,11 @@ def cooc_mutbamscan(
         assert (
             len(voc) > 0
         ), "Neither --voc nor --vocdir provided. Please provide variants of concern definition yamls."
-        amplicons = make_all_amplicons(bedfile, voc, revert=revert, n_cooc=cooc)
+        amp_bed = bed_load(bedfile, sort)
+        amplicons = make_all_amplicons(amp_bed, voc, revert=revert, n_cooc=cooc)
         # and save them for future reference
         if outamp:
-            write_all_amplicons(amplicons, outamp)
+            write_all_amplicons(amplicons, outamp, amp_bed if comment else None)
 
     rq_chr = rq_chr  # e.g.: 'NC_045512.2'
 

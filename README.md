@@ -56,6 +56,8 @@ Options:
                                   revert category)
   -b, --bedfile BED               bedfile defining the amplicons, with format:
                                   ref\tstart\tstop\tamp_num\tpool\tstrand
+  --sort / --no-sort             sort the bedfile by 'reference name' and
+                                  'start position' (default: sorted)
   -#, --cooc COOC                 minimum number of cooccurences to search for
   -Q, --amplicons, --in-amp, --in-amplicons YAML
                                   use the supplied YAML file to query
@@ -63,6 +65,9 @@ Options:
                                   voc's DIR
   -A, --out-amp, --out-amplicons YAML
                                   output amplicon query in a YAML file
+  --comment / --no-comment        add comments in the out amplicon YAML with
+                                  names from BED file (default: comment the
+                                  YAML)
   -j, --json JSON                 output results to as JSON file
   -y, --yaml YAML                 output results to as yaml file
   -t, --tsv TSV                   output results to as (raw) tsv file
@@ -448,13 +453,13 @@ curl -o SARS-CoV-2.v532.primer.bed 'https://raw.githubusercontent.com/artic-netw
 curl -O 'https://raw.githubusercontent.com/cbg-ethz/cowwid/master/voc/omicron_ba286_mutations_full.yaml'
 
 # check which primers have at least 1 mutation falling in their target binding regions
-cojac cooc-mutbamscan --voc omicron_ba286_mutations_full.yaml --bedfile SARS-CoV-2.v532.primer.bed --cooc 1 --out-amp affected_primers.v532.yaml
+cojac cooc-mutbamscan --voc omicron_ba286_mutations_full.yaml --bedfile SARS-CoV-2.v532.primer.bed --no-sort --cooc 1 --out-amp affected_primers.v532.yaml
 ```
 
 
 This will yields entries like:
 ```yaml
-50_ombba286: [7819, 7850, 7512, 7738, {7842: G}]
+50_ombba286: [7819, 7850, 7512, 7738, {7842: G}] # SARS-CoV-2_25_RIGHT
 ```
 
 meaning:
