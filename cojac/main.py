@@ -1,4 +1,7 @@
 import click
+from ._version import __version__
+
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 from .cooc_colourmut import cooc_colourmut
 from .cooc_curate import cooc_curate
@@ -9,7 +12,8 @@ from .phe2cojac import phe2cojac
 from .sig_generate import sig_generate
 
 
-@click.group()
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option(__version__)
 def cli():
     #  auto_envvar_prefix='...' for fetching options (such as passwords) from environment.
     pass

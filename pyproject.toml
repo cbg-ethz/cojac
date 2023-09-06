@@ -1,15 +1,20 @@
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
 name = "cojac"
-version = "0.2"
+version = "0.0.0"
 description = "A set of commandline tools to analyse co-occurrence of mutations on amplicons."
-license = "GPL"
+license = "GPL-3.0-or-later"
 authors = ["David Dreifuss <dadreifuss@gmail.com>", "Ivan Blagoev Topolsky <ivan.topolsky@bsse.ethz.ch>", "kpj <kim.philipp.jablonski@gmail.com>"]
+maintainers = ["Ivan Blagoev Topolsky <ivan.topolsky@bsse.ethz.ch>"]
 readme = "README.md"
 repository = "https://github.com/cbg-ethz/cojac"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
 
 [tool.poetry.dependencies]
 python = "^3.8.0"

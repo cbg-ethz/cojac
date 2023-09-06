@@ -547,12 +547,17 @@ conda deactivate
 conda env remove -n cojac
 ```
 
-### Python Package Index
+### Python poetry
 
-Alternatively, you can install `cojac` using pip:
+COJAC has its dependencies in a [pyproject.toml](pyproject.toml) managed
+with poetry and can be installed with it.
 
 ```bash
-pip install cojac
+# If not installed system-wide: manually run poetry-dynamic-versioning
+poetry-dynamic-versioning
+# (this sets the version string from the git currently cloned and checked out)
+
+poetry install
 ```
 
 ## Additional notebooks
