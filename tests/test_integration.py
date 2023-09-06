@@ -20,12 +20,52 @@ def test_workflow():
         [
             "wget",
             "--no-clobber",
-            "https://raw.githubusercontent.com/phe-genomics/variant_definitions/main/variant_yaml/imagines-viewable.yml",
+            "https://raw.githubusercontent.com/ukhsa-collaboration/variant_definitions/main/variant_yaml/imagines-viewable.yml",
+            "https://raw.githubusercontent.com/hodcroftlab/covariants/master/defining_mutations/21K.Omicron.tsv",
+            "https://raw.githubusercontent.com/cbg-ethz/cowwid/master/voc/omicron_ba286_mutations_full.yaml",
         ]
     )
 
+    subprocess.run(
+        [
+            "wget",
+            "--no-clobber",
+            "-O",
+            "SARS-CoV-2.v532.primer.bed",
+            "https://raw.githubusercontent.com/artic-network/primer-schemes/master/nCoV-2019/V5.3.2/SARS-CoV-2.primer.bed",
+        ]
+    )
+
+    # dummy run
+    subprocess.check_call(["cojac", "--version"])
+
     # retrieve variants
     # TODO: mock network access
+    # alternative 1: CovSpectrum
+    subprocess.check_call(
+        [
+            "cojac",
+            "sig-generate",
+            "--url",
+            "https://lapis.cov-spectrum.org/open/v1",
+            "--variant",
+            "BA.1",
+        ]
+    )
+
+    # alternative 2: covariants
+    subprocess.check_call(
+        [
+            "cojac",
+            "sig-generate",
+            "--covariants",
+            "21K.Omicron.tsv",
+            "--variant",
+            "BA.1",
+        ]
+    )
+
+    # alternative 3: UKHSA
     subprocess.check_call(
         [
             "cojac",
@@ -102,4 +142,21 @@ def test_workflow():
     )
     subprocess.check_call(
         ["cojac", "cooc-tabmut", "-j", "cooc-test.json", "-o", "cooc-export.csv"]
+    )
+
+    # primers affected by mutations
+    subprocess.check_call(
+        [
+            "cojac",
+            "cooc-mutbamscan",
+            "--voc",
+            "omicron_ba286_mutations_full.yaml",
+            "--bedfile",
+            "SARS-CoV-2.v532.primer.bed",
+            "--no-sort",
+            "--cooc",
+            "1",
+            "--out-amp",
+            "affected_primers.v532.yaml",
+        ]
     )
