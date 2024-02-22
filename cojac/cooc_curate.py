@@ -28,8 +28,8 @@ lintype = "nextcladePangoLineage"
 def setURL(url):
     """
     Switch to a different API end-point:
-    - https://lapis.cov-spectrum.org/open/v1 : ENA open sequences
-    - https://lapis.cov-spectrum.org/gisaid/v1 : GISAID sequences
+    - https://lapis.cov-spectrum.org/open/v2 : ENA open sequences
+    - https://lapis.cov-spectrum.org/gisaid/v2 : GISAID sequences
     Note: Acess keys are mandatory on non-open end-points
     """
     global server
@@ -93,7 +93,14 @@ def nucmutations(**kwargs):
     """
     kwargs["accessKey"] = getAccessKey()
     reply = json.loads(
-        requests.get(f"{server}/sample/nuc-mutations", params=kwargs).text
+        requests.get(
+            (
+                f"{server}/sample/nuc-mutations"
+                if server[-2:] == "v1" or server[-3:] == "v1/"
+                else f"{server}/sample/nucleotideMutations"
+            ),
+            params=kwargs,
+        ).text
     )
 
     checkerror(reply)
@@ -137,10 +144,14 @@ def listalllineages():
 def mutsinlineages(*mutations):
     """looks for presence of specific mutations,
     return lineages and count of samples carrying them"""
-    return {
-        s[lintype]: s["count"]
-        for s in aggregated(nucMutations=",".join(mutations), fields=lintype)
+    mutrequest = {
+        (
+            "nucMutations"
+            if server[-2:] == "v1" or server[-3:] == "v1/"
+            else "nucleotideMutations"
+        ): ",".join(mutations)
     }
+    return {s[lintype]: s["count"] for s in aggregated(fields=lintype, **mutrequest)}
 
 
 #
@@ -287,7 +298,7 @@ def curate_muts(
     required=False,
     default=None,
     type=str,
-    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v2, https://lapis.cov-spectrum.org/gisaid/v2, etc.)",
 )
 @click.option(
     "-a",
