@@ -7,7 +7,7 @@ import click
 import yaml
 import csv
 
-from .cooc_curate import listfilteredmutations, setURL
+from .cooc_curate import listfilteredmutations, setURL, setLinType
 
 
 # regex
@@ -28,6 +28,14 @@ parsenuc = re.compile(
     default=None,
     type=str,
     help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+)
+@click.option(
+    "--lintype",
+    metavar="FIELD",
+    required=False,
+    default=None,
+    type=str,
+    help="switch the lineage field queried on covspectrum (e.g. nextcladePangoLineage: as determined with nextclade, pangoLineage: as provided by upstream sequence repository)",
 )
 @click.option(
     "--var",
@@ -88,9 +96,13 @@ parsenuc = re.compile(
     "debug",
     default=False,
 )
-def sig_generate(url, var, minfreq, mindelfreq, minseqs, extras, covariants, debug):
+def sig_generate(
+    url, lintype, var, minfreq, mindelfreq, minseqs, extras, covariants, debug
+):
     if url:
         setURL(url)
+    if lintype:
+        setLinType(lintype)
 
     if debug:
         import sys

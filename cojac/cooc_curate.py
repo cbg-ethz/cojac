@@ -301,6 +301,14 @@ def curate_muts(
     help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v2, https://lapis.cov-spectrum.org/gisaid/v2, etc.)",
 )
 @click.option(
+    "--lintype",
+    metavar="FIELD",
+    required=False,
+    default=None,
+    type=str,
+    help="switch the lineage field queried on covspectrum (e.g. nextcladePangoLineage: as determined with nextclade, pangoLineage: as provided by upstream sequence repository)",
+)
+@click.option(
     "-a",
     "--amplicons",
     "amp",
@@ -347,9 +355,11 @@ def curate_muts(
     help="use coloured output",
 )
 @click.argument("voc", nargs=-1)
-def cooc_curate(url, amp, domuts, high, low, collapse, colour, voc):
+def cooc_curate(url, lintype, amp, domuts, high, low, collapse, colour, voc):
     if url:
         setURL(url)
+    if lintype:
+        setLinType(lintype)
     amplicons = None
     if amp:
         with open(amp, "r") as yf:
