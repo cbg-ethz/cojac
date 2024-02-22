@@ -153,9 +153,11 @@ def cooc_tabmut(
                 line.update(
                     {
                         "amplicon": anum,
-                        "frac": (float(muts_cnt) / float(sites_cnt))
-                        if sites_cnt
-                        else float("nan"),
+                        "frac": (
+                            (float(muts_cnt) / float(sites_cnt))
+                            if sites_cnt
+                            else float("nan")
+                        ),
                         "cooc": (sites_cnt_l if int(sites_cnt_l) > 0 else ""),
                         "count": sites_cnt,
                         "mut_all": muts_cnt,
@@ -171,9 +173,11 @@ def cooc_tabmut(
                         (ampcol, "count"): sites_cnt,
                         (ampcol, "mut_all"): muts_cnt,
                         (ampcol, "mut_oneless"): mut_oneless,
-                        (ampcol, "frac"): (float(muts_cnt) / float(sites_cnt))
-                        if sites_cnt
-                        else float("nan"),
+                        (ampcol, "frac"): (
+                            (float(muts_cnt) / float(sites_cnt))
+                            if sites_cnt
+                            else float("nan")
+                        ),
                         (ampcol, "cooc"): (sites_cnt_l if int(sites_cnt_l) > 0 else ""),
                     }
                 )

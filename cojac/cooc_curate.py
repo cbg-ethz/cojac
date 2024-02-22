@@ -59,16 +59,18 @@ def getAccessKey():
         return netrc.netrc().authenticators(urlparse(server).netloc)[2]
     except:
         print(
-            f"no access key found for {urlparse(server).netloc} in ~/.netrc\n"
-            f"your requests are likely to be not allowed by the server\n"
-            f"please add the following entry in your ~/.netrc:\n"
-            f"```\n"
-            f"machine {urlparse(server).netloc}\n"
-            f"password <YOUR_ACCESS_KEY_HERE>\n"
-            f"```\n"
-            f"or use the COVSPECTRUM_ACCESSKEY envrionment variable\n"
-            if "open" not in server
-            else f"(not using access keys on API {server})",
+            (
+                f"no access key found for {urlparse(server).netloc} in ~/.netrc\n"
+                f"your requests are likely to be not allowed by the server\n"
+                f"please add the following entry in your ~/.netrc:\n"
+                f"```\n"
+                f"machine {urlparse(server).netloc}\n"
+                f"password <YOUR_ACCESS_KEY_HERE>\n"
+                f"```\n"
+                f"or use the COVSPECTRUM_ACCESSKEY envrionment variable\n"
+                if "open" not in server
+                else f"(not using access keys on API {server})"
+            ),
             file=sys.stderr,
         )
         # sys.exit(1)

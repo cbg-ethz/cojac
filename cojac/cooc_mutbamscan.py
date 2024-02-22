@@ -103,12 +103,16 @@ def scanamplicon(read_iter, mut_dict):
 
     # look at last column only
     return {
-        "sites": dict(zip(sites_cnt[0].tolist(), sites_cnt[1].tolist()))
-        if len(all_sites)
-        else {},
-        "muts": dict(zip(muts_cnt[0].tolist(), muts_cnt[1].tolist()))
-        if len(all_muts)
-        else {},
+        "sites": (
+            dict(zip(sites_cnt[0].tolist(), sites_cnt[1].tolist()))
+            if len(all_sites)
+            else {}
+        ),
+        "muts": (
+            dict(zip(muts_cnt[0].tolist(), muts_cnt[1].tolist()))
+            if len(all_muts)
+            else {}
+        ),
     }
 
 
@@ -278,9 +282,11 @@ def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2):
         loaded_yamls.append(
             filter_decode_vartiant(
                 loaded_yaml,
-                categories=["revert", "mut", "extra", "shared", "subset"]
-                if revert
-                else ["mut", "extra", "shared", "subset"],
+                categories=(
+                    ["revert", "mut", "extra", "shared", "subset"]
+                    if revert
+                    else ["mut", "extra", "shared", "subset"]
+                ),
             )
         )
 
@@ -307,9 +313,9 @@ def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2):
                 print(f"{k1} is identical to {k2}")
                 # sort the variant names part of the list, to be consistent between calls, no matter the filesystem's on-disk order
                 # (i.e.: no 76_AY42_IN2 vs 76_IN2_AY42)
-                amplicons[
-                    "_".join([npart[0]] + sorted(npart[1:] + [yam["name"]]))
-                ] = amplicons.pop(k2)
+                amplicons["_".join([npart[0]] + sorted(npart[1:] + [yam["name"]]))] = (
+                    amplicons.pop(k2)
+                )
                 del amp_dict[k1]
                 break
 

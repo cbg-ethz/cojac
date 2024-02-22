@@ -148,12 +148,14 @@ def cooc_pubmut(
                     # TODO incorporate output of curate
                     ",".join(
                         [
-                            f"{p}{b}"
-                            if len(b) == 1
-                            else (
-                                f"\u0394{p}-{p + len(b) - 1}"
-                                if b == "-" * len(b)
-                                else f"{p}\u2192{b}"
+                            (
+                                f"{p}{b}"
+                                if len(b) == 1
+                                else (
+                                    f"\u0394{p}-{p + len(b) - 1}"
+                                    if b == "-" * len(b)
+                                    else f"{p}\u2192{b}"
+                                )
                             )
                             for p, b in aqu[4].items()
                         ]

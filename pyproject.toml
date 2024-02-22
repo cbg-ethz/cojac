@@ -27,7 +27,7 @@ click = "^8.0.3"
 requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
-black = "^22.1.0"
+black = "^24.2.0"
 pytest = "^6.2.1"
 
 [tool.poetry.scripts]
