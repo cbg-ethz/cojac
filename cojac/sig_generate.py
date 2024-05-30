@@ -27,7 +27,7 @@ parsenuc = re.compile(
     required=False,
     default=None,
     type=str,
-    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v1, https://lapis.cov-spectrum.org/gisaid/v1, etc.)",
+    help="url to use when querying covspectrum (e.g. https://lapis.cov-spectrum.org/open/v2, https://lapis.cov-spectrum.org/gisaid/v2, etc.)",
 )
 @click.option(
     "--lintype",

@@ -47,7 +47,7 @@ def test_workflow():
             "cojac",
             "sig-generate",
             "--url",
-            "https://lapis.cov-spectrum.org/open/v1",
+            "https://lapis.cov-spectrum.org/open/v2",
             "--variant",
             "BA.1",
         ]

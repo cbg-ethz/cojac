@@ -21,7 +21,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 #
 
 
-server = "https://lapis.cov-spectrum.org/open/v1"
+server = "https://lapis.cov-spectrum.org/open/v2"
 lintype = "nextcladePangoLineage"
 debug = False
 
