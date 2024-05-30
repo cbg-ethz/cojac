@@ -23,6 +23,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 
 server = "https://lapis.cov-spectrum.org/open/v1"
 lintype = "nextcladePangoLineage"
+debug = False
 
 
 def setURL(url):
@@ -42,7 +43,17 @@ def setLinType(lin):
     - nextcladePangoLineage : as found by nextclade
     - pangoLineage : as provided by GISAID
     """
+    global lintype
     lintype = lin
+
+
+def setDebug(d):
+    """
+    Switch debug on or off
+    - this will show urlparse
+    """
+    global debug
+    debug = d
 
 
 def getAccessKey():
@@ -92,13 +103,20 @@ def nucmutations(**kwargs):
     - list of mutation, frequencies and sample counts (for all frequencies > 0.05 )
     """
     kwargs["accessKey"] = getAccessKey()
+    url = (
+        f"{server}/sample/nuc-mutations"
+        if server[-2:] == "v1" or server[-3:] == "v1/"
+        else f"{server}/sample/nucleotideMutations"
+    )
+
+    if debug:
+        print(
+            f"url: {url}\nargs:\n{kwargs}\n",
+            file=sys.stderr,
+        )
     reply = json.loads(
         requests.get(
-            (
-                f"{server}/sample/nuc-mutations"
-                if server[-2:] == "v1" or server[-3:] == "v1/"
-                else f"{server}/sample/nucleotideMutations"
-            ),
+            url,
             params=kwargs,
         ).text
     )
@@ -122,7 +140,15 @@ def aggregated(**kwargs):
     - count of samples that fit criteria (the other parameters)
     """
     kwargs["accessKey"] = getAccessKey()
-    reply = json.loads(requests.get(f"{server}/sample/aggregated", params=kwargs).text)
+    url = f"{server}/sample/aggregated"
+
+    if debug:
+        print(
+            f"url: {url}\nargs:\n{kwargs}\n",
+            file=sys.stderr,
+        )
+
+    reply = json.loads(requests.get(url, params=kwargs).text)
 
     checkerror(reply)
 
@@ -354,12 +380,20 @@ def curate_muts(
     default=True,
     help="use coloured output",
 )
+@click.option(
+    "--debug/--no-debug",
+    "debug",
+    default=False,
+    help="show API calls details (urls and arguments)",
+)
 @click.argument("voc", nargs=-1)
-def cooc_curate(url, lintype, amp, domuts, high, low, collapse, colour, voc):
+def cooc_curate(url, lintype, amp, domuts, high, low, collapse, colour, voc, debug):
     if url:
         setURL(url)
     if lintype:
         setLinType(lintype)
+    if debug:
+        setDebug(debug)
     amplicons = None
     if amp:
         with open(amp, "r") as yf:

@@ -144,8 +144,8 @@ Options:
 $ cojac cooc-curate --help
 Usage: cojac cooc-curate [OPTIONS] [VOC]...
 
-  Helps determining specific mutations and cooccurrences by querying CoV-
-  Spectrum
+  Helps determining specific mutations and cooccurrences by querying
+  covSPECTRUM
 
 Options:
   -u, --url URL               url to use when querying covspectrum (e.g.
@@ -166,7 +166,8 @@ Options:
                               assessing signatures of old variants that have
                               branched out by now.
   --colour / --no-colour      use coloured output
-  --help                      Show this message and exit.
+  --debug / --no-debug        show API calls details (urls and arguments)
+  -h, --help                  Show this message and exit.
 
   This tool queries LAPIS, see https://lapis-docs.readthedocs.io/en/latest/
 ```
@@ -187,7 +188,7 @@ Options:
 
 ```console
 $ cojac sig-generate --help
-Usage: cojac  sig-generate [OPTIONS]
+Usage: cojac sig-generate [OPTIONS]
 
   Helps generating a list of mutations frequently found in a variant by
   querying covSPECTRUM
@@ -206,18 +207,18 @@ Options:
   -f, --minfreq FREQ      Minimum frequency for inclusion in list
   -d, --mindelfreq FREQ   Use a different minimum frequency for deletions
                           (useful early on when there are few sequences and
-                          some of those were produced by pipeline that don't
+                          some of those were produced by pipelines that don't
                           handle deletions)
   -s, --minseqs NUM       Minimum number of sequence supporting for inclusion
                           in list
   --covariants TSV        import from a covariants.org TSV file instead of
                           covSpectrum. (See: https://github.com/hodcroftlab/co
                           variants/blob/master/defining_mutations/)
-  --debug / --no-debug
-  --help                  Show this message and exit.
+  --debug / --no-debug    show 'extra' query content, show API details (urls
+                          and arguments)
+  -h, --help              Show this message and exit.
 
   This tool queries LAPIS, see https://lapis-docs.readthedocs.io/en/latest/
-
 ```
 
 ## Howto

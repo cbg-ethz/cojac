@@ -7,7 +7,7 @@ import click
 import yaml
 import csv
 
-from .cooc_curate import listfilteredmutations, setURL, setLinType
+from .cooc_curate import listfilteredmutations, setURL, setLinType, setDebug
 
 
 # regex
@@ -95,6 +95,7 @@ parsenuc = re.compile(
     "--debug/--no-debug",
     "debug",
     default=False,
+    help="show 'extra' query content, show API details (urls and arguments)",
 )
 def sig_generate(
     url, lintype, var, minfreq, mindelfreq, minseqs, extras, covariants, debug
@@ -105,10 +106,16 @@ def sig_generate(
         setLinType(lintype)
 
     if debug:
+        setDebug(debug)
         import sys
 
         print(
-            "extra:\n", yaml.load(extras, Loader=yaml.FullLoader), "\n", file=sys.stderr
+            (
+                "extra:\n",
+                yaml.load(extras, Loader=yaml.FullLoader) if extras else "extra: None",
+            ),
+            "\n",
+            file=sys.stderr,
         )
 
     # get initial list
