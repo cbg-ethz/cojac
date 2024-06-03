@@ -7,7 +7,7 @@ import click
 import yaml
 import csv
 
-from .cooc_curate import listfilteredmutations, setURL, setLinType, setDebug
+from .cooc_curate import listfilteredmutations, setURL, setLinType, setDebug, quirks
 
 
 # regex
@@ -97,13 +97,23 @@ parsenuc = re.compile(
     default=False,
     help="show 'extra' query content, show API details (urls and arguments)",
 )
+@click.option(
+    "--quirk",
+    "quirk",
+    multiple=True,
+    default=set(),
+    type=click.Choice(["noStar"], case_sensitive=False),
+    help="special work-around options",
+)
 def sig_generate(
-    url, lintype, var, minfreq, mindelfreq, minseqs, extras, covariants, debug
+    url, lintype, var, minfreq, mindelfreq, minseqs, extras, covariants, debug, quirk
 ):
     if url:
         setURL(url)
     if lintype:
         setLinType(lintype)
+    if quirk:
+        quirks(quirk)
 
     if debug:
         setDebug(debug)

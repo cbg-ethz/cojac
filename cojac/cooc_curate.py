@@ -24,6 +24,7 @@ from .mut_parser import mut_decode, filter_decode_vartiant
 server = "https://lapis.cov-spectrum.org/open/v2"
 lintype = "nextcladePangoLineage"
 debug = False
+noStar = False
 
 
 def setURL(url):
@@ -54,6 +55,16 @@ def setDebug(d):
     """
     global debug
     debug = d
+
+
+def quirks(q):
+    if "noStar" in q:
+        global noStar
+        noStar = True
+        print(
+            "quirk: skipping star on lineages\n",
+            file=sys.stderr,
+        )
 
 
 def getAccessKey():
@@ -131,7 +142,7 @@ def listmutations(lineage, extras={}):
     if "variantQuery" in extras.keys():
         # NOTE according to covspectrum: "Please specify the variant either by using the fields pangoLineage, nextstrainClade, gisaidClade, aaMutations and nucMutations, or by using variantQuery - don't use both at the same time."
         return nucmutations(**extras)
-    return nucmutations(**{lintype: (lineage + "*")}, **extras)
+    return nucmutations(**{lintype: (lineage if noStar else f"{lineage}*")}, **extras)
 
 
 def aggregated(**kwargs):
@@ -158,7 +169,10 @@ def aggregated(**kwargs):
 def listsublineages(lineage):
     """list all lineages which are known to be either the variant it self or one of its sub-variants"""
     return set(
-        s[lintype] for s in aggregated(**{lintype: (lineage + "*")}, fields=lintype)
+        s[lintype]
+        for s in aggregated(
+            **{lintype: (lineage if noStar else f"{lineage}*")}, fields=lintype
+        )
     )
 
 
@@ -386,14 +400,26 @@ def curate_muts(
     default=False,
     help="show API calls details (urls and arguments)",
 )
+@click.option(
+    "--quirk",
+    "quirk",
+    multiple=True,
+    default=set(),
+    type=click.Choice(["noStar"], case_sensitive=False),
+    help="special work-around options",
+)
 @click.argument("voc", nargs=-1)
-def cooc_curate(url, lintype, amp, domuts, high, low, collapse, colour, voc, debug):
+def cooc_curate(
+    url, lintype, amp, domuts, high, low, collapse, colour, voc, debug, quirk
+):
     if url:
         setURL(url)
     if lintype:
         setLinType(lintype)
     if debug:
         setDebug(debug)
+    if quirk:
+        quirks(quirk)
     amplicons = None
     if amp:
         with open(amp, "r") as yf:
@@ -428,11 +454,11 @@ def cooc_curate(url, lintype, amp, domuts, high, low, collapse, colour, voc, deb
         if len(sublineages) > 1 and collapse:
             # do not use the common list of all lineage, instead collapse those who are part of the current considered variant into a single category
             # e.g. combine counts of BA.1,BA.1.1,BA.2,BA.3,etc. => B.1.1.529*
-            combinedname = f"{lineage}*"
+            combinedname = lineage if noStar else f"{lineage}*"
             common_kwargs["alllin"] = collapse_sublineages(
                 alllin, sublineages, combinedname
             )
-            common_kwargs["combined"] = f"{lineage}*"
+            common_kwargs["combined"] = combinedname
         else:
             common_kwargs["combined"] = None
 
