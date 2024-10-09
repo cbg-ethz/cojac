@@ -72,6 +72,17 @@ import click
     help="Use multi-level indexing (amplicons and counts categories)",
 )
 @click.option(
+    "-a",
+    "--add-mutations",
+    "--am",
+    "amp",
+    metavar="YAML",
+    required=False,
+    default=None,
+    type=str,
+    help="add mutations descriptions using list of query amplicons, from mutbamscan",
+)
+@click.option(
     "-q",
     "--quiet",
     is_flag=True,
@@ -79,8 +90,43 @@ import click
     help="Run quietly: do not print the table",
 )
 def cooc_tabmut(
-    json_fname, yaml_fname, batchname, csv_fname, lines, semi, multiindex, quiet
+    json_fname, yaml_fname, batchname, csv_fname, lines, semi, multiindex, amp, quiet
 ):
+    # load amplicons
+    amplicon_nfo = {}
+    if amp:
+        assert os.path.isfile(amp), f"cannot find amplicon file yaml file {amp}"
+        with open(amp, "rt") as yf:
+            amp_str = yaml.safe_load(yf)
+
+        amplicon_nfo = {
+            a: "|".join(
+                [
+                    # Mutations
+                    ",".join(
+                        [
+                            (
+                                f"{p}{b}"
+                                if len(b) == 1
+                                else (
+                                    f"d{p}-{p + len(b) - 1}"
+                                    if b == "-" * len(b)
+                                    else f"{p}>{b}"
+                                )
+                            )
+                            for p, b in aqu[4].items()
+                        ]
+                    ),
+                    # Genomic position span
+                    # f"[{aqu[0]}-{aqu[1]}]",
+                    # Amplicon number
+                    # f"Amp{a.split('_')[0]}",
+                ]
+            )
+            for a, aqu in amp_str.items()
+        }
+        # print(amplicon_nfo)
+
     # load table
     table = {}
 
@@ -150,6 +196,8 @@ def cooc_tabmut(
                 line = {"sample": sam}
                 if batch:
                     line.update({"batch": batch})
+                if ampname in amplicon_nfo:
+                    line.update({"mutations": amplicon_nfo[ampname]})
                 line.update(
                     {
                         "amplicon": anum,
