@@ -57,9 +57,12 @@ Options:
                                   revert category)
   -b, --bedfile BED               bedfile defining the amplicons, with format:
                                   ref\tstart\tstop\tamp_num\tpool\tstrand
-  --sort / --no-sort             sort the bedfile by 'reference name' and
+  --sort / --no-sort              sort the bedfile by 'reference name' and
                                   'start position' (default: sorted)
   -#, --cooc COOC                 minimum number of cooccurrences to search for
+  --fix-subset, --fs / --no-fix-subset, --no-fs
+                                  Fix variants attribution when cooccurrence
+                                  are subset/superset of other variants
   -Q, --amplicons, --in-amp, --in-amplicons YAML
                                   use the supplied YAML file to query
                                   amplicons instead of building it from BED +
@@ -73,7 +76,7 @@ Options:
   -y, --yaml YAML                 output results to a yaml file
   -t, --tsv TSV                   output results to a (raw) tsv file
   -d, --dump                      dump the python object to the terminal
-  --help                          Show this message and exit.
+  -h, --help                      Show this message and exit.
 
   @listfile can be used to pass a long list of parameters (e.g.: a large
   number of BAMs) in a file instead of command line

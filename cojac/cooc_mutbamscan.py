@@ -269,7 +269,7 @@ def bed_load(bedfile, sort=True):
     return amp_bed
 
 
-def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2):
+def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2, subset_fix=True):
     """given a .BED file and a directory with YAMLs decribing VOCs,
     generates all amplicons to search that have at least n_cooc mutations
     """
@@ -307,21 +307,85 @@ def make_all_amplicons(amp_bed, vocs, revert=False, n_cooc=2):
                 # search same amplicon number
                 if npart[0] != ampname:
                     continue
+
                 # compare amplicon definitions
                 if d1 != d2:
+                    # if we're only interested in matches
                     continue
-                print(f"{k1} is identical to {k2}")
+
+                print(
+                    f"{k1} is identical to {k2}: {  ','.join([ f'{p}{b}' for p, b in d1[4].items() ])}"
+                )
                 # sort the variant names part of the list, to be consistent between calls, no matter the filesystem's on-disk order
                 # (i.e.: no 76_AY42_IN2 vs 76_IN2_AY42)
-                amplicons["_".join([npart[0]] + sorted(npart[1:] + [yam["name"]]))] = (
-                    amplicons.pop(k2)
-                )
+                newk2 = "_".join([npart[0]] + sorted(npart[1:] + [yam["name"]]))
+                print(f"\t{k2} => {newk2}")
+                amplicons[newk2] = amplicons.pop(k2)
                 del amp_dict[k1]
                 break
 
         # merge dicts
         if len(amp_dict):
             amplicons.update(amp_dict)
+
+    # now check for subsets situations
+    if subset_fix:
+        # build look-up map
+        # mutations sets back to amplicons
+        rlum = {}
+        for k, d in amplicons.items():
+            # nothing can be a subset of a set of one
+            if len(d[4]) == 1:
+                continue
+
+            mutset = {f"{p}{b}" for p, b in d[4].items()}
+            varset = set(k.split("_")[1:])
+            ampname = k.split("_")[0]
+
+            if ampname not in rlum:
+                rlum[ampname] = []
+
+            rlum[ampname] += [(k, mutset, varset)]
+
+        #  now examine each amplicon in succession in search of subsets
+        for k1, d in list(amplicons.items()):
+            origk1 = k1
+            ampmutset = {f"{p}{b}" for p, b in d[4].items()}
+            ampname = k1.split("_")[0]
+
+            # are there *any* longer than 1 set of which we could be subsets?
+            if ampname not in rlum:
+                continue
+
+            ampmutnum = len(ampmutset)
+            # compare against the whole set (inefficient, but well)
+            for k2, mutset, varset in rlum[ampname]:
+                # skip self
+                if k2 == origk1:
+                    # sanity check
+                    assert (
+                        mutset == ampmutset
+                    ), f"something went wrong while building index: wrong self '{mutset}' vs '{ampmutset}'"
+                    continue
+
+                # it must be a larger set if we have any chance of being a *sub*set
+                if len(mutset) <= ampmutnum:
+                    continue
+
+                if 0 == len(ampmutset - mutset):
+                    print(f"{origk1}'s '{ampmutset}' is a subset of {k2}'s '{mutset}'")
+
+                    ampvset = set(k1.split("_")[1:])
+
+                    newk1 = "_".join([ampname] + sorted(list(ampvset.union(varset))))
+                    # only update the label
+                    k1 = newk1
+                    continue
+
+            # rename the entry using the final label
+            if k1 != origk1:
+                print(f"\t{origk1} => {k1}")
+                amplicons[k1] = amplicons.pop(origk1)
 
     return amplicons
 
@@ -498,6 +562,13 @@ def write_all_amplicons(amplicons, outamp, amp_bed=None):
     type=int,
     help="minimum number of cooccurrences to search for",
 )
+@click.option(
+    "--fix-subset/--no-fix-subset",
+    "--fs/--no-fs",
+    "subset_fix",
+    default=False,
+    help="Fix variants attribution when cooccurrence are subset/superset of other variants",
+)
 # TODO: use mutually exclusive groups
 @click.option(
     "-Q",
@@ -576,6 +647,7 @@ def cooc_mutbamscan(
     bedfile,
     sort,
     cooc,
+    subset_fix,
     inamp,
     outamp,
     comment,
@@ -602,7 +674,9 @@ def cooc_mutbamscan(
             len(voc) > 0
         ), "Neither --voc nor --vocdir provided. Please provide variants of concern definition yamls."
         amp_bed = bed_load(bedfile, sort)
-        amplicons = make_all_amplicons(amp_bed, voc, revert=revert, n_cooc=cooc)
+        amplicons = make_all_amplicons(
+            amp_bed, voc, revert=revert, n_cooc=cooc, subset_fix=subset_fix
+        )
         # and save them for future reference
         if outamp:
             write_all_amplicons(amplicons, outamp, amp_bed if comment else None)
