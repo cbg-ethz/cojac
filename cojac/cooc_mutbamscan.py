@@ -402,15 +402,16 @@ def load_all_amplicons(inamp):
 
 def add_name_comments(in_str, amp_bed):
     out_str = ""
-    rxnum = re.compile(r"^\d+(?=_)")
+    rxnum = re.compile(r"^(?:\? +)?(?P<num>\d+)(?=_)")
 
     n = None
     for l in in_str.splitlines():
         find_n = rxnum.match(l)
         if find_n:
-            n = int(find_n.group(0))
-        if l[-1] == "]" and n is not None:
+            n = int(find_n.groupdict().get("num", 0))
+        if l[-1] == "]" and n:
             l += f" #\t{amp_bed['amp_num'][n - 1]}"
+            n = None
         out_str += f"{l}\n"
 
     return out_str
