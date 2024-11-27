@@ -97,6 +97,19 @@ def test_workflow():
     subprocess.check_call(
         [
             "cojac",
+            "cooc-mutbamscan",
+            "-b",
+            "nCoV-2019.insert.V3.bed",
+            "-m",
+            "voc/",
+            "--fs",
+            "-A",
+            "amplicons.v3.fixedsub.yaml",
+        ]
+    )
+    subprocess.check_call(
+        [
+            "cojac",
             "cooc-curate",
             "-a",
             "amplicons.v3.yaml",
@@ -141,7 +154,16 @@ def test_workflow():
         ]
     )
     subprocess.check_call(
-        ["cojac", "cooc-tabmut", "-j", "cooc-test.json", "-o", "cooc-export.csv"]
+        [
+            "cojac",
+            "cooc-tabmut",
+            "-j",
+            "cooc-test.json",
+            "--am",
+            "amplicons.v3.yaml",
+            "-o",
+            "cooc-export.csv",
+        ]
     )
 
     # primers affected by mutations
