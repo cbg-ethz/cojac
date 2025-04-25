@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # For Python dependencies managed with Poetry
+  - package-ecosystem: "poetry"
+    directory: "/" 
+    schedule:
+      interval: "weekly"
+
+  # For Conda dependencies
+  - package-ecosystem: "conda"
+    directory: "/" 
+    schedule:
+      interval: "weekly"
