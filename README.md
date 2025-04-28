@@ -286,7 +286,7 @@ cojac cooc-curate voc/omicron_ba2_mutations.yaml
 > - Another possibility is obtaining an exhaustive list of mutations from covSpectrum or [covariants.org's repository](https://github.com/hodcroftlab/covariants/tree/master/defining_mutations)
 ```bash
 # display the exhaustive list of all mutations known to appear on Omicron BA.1 on covSPECTRUM:
-cojac sig-generate --url https://lapis.cov-spectrum.org/open/v1 --variant BA.1 | tee list_ba1.yaml
+cojac sig-generate --url https://lapis.cov-spectrum.org/open/v2 --variant BA.1 | tee list_ba1.yaml
 
 # or, Alternatively, download the TSV from covariants.org's repo and extract the list:
 curl -O 'https://raw.githubusercontent.com/hodcroftlab/covariants/master/defining_mutations/21K.Omicron.tsv'
