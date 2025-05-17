@@ -28,7 +28,7 @@ requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
 black = "^24.2.0"
-pytest = "^6.2.1"
+pytest = "^8.3.5"
 
 [tool.poetry.scripts]
 cojac = "cojac:cli"
