@@ -1,13 +1,10 @@
 version: 2
 updates:
-  # For Python dependencies managed with Poetry
-  - package-ecosystem: "poetry"
-    directory: "/" 
+  - package-ecosystem: "pip"
+    directory: "/"
     schedule:
       interval: "weekly"
-
-  # For Conda dependencies
-  - package-ecosystem: "conda"
-    directory: "/" 
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
