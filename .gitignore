@@ -18,6 +18,11 @@ __pycache__/
 # Poetry
 poetry.lock
 
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
 # Test artifacts
 *.bam
 *.bai
