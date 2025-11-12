@@ -2,8 +2,8 @@ name: rpy2
 channels:
   - defaults
 dependencies:
-  - python=3.7
-  - rpy2=2.9.4
+  - python>=3.10
+  - rpy2>=3.5
   - seaborn
   - statsmodels
   - natsort

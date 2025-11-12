@@ -10,3 +10,25 @@ notebooks/data_per_city.csv
 notebooks/data_per_day_and_canton2.csv
 notebooks/ww_update_data.json
 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Poetry
+poetry.lock
+
+# Test artifacts
+*.bam
+*.bai
+*.tsv
+*.yml
+*.yaml
+!voc/*.yaml
+!notebooks/*.yaml
+!conda_cojac_env.yaml
+!.github/**/*.yaml
+*.bed
+!nCoV-2019.insert.V3.bed
+!SARS-CoV-2.insert.V4.txt
+
