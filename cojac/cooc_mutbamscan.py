@@ -664,8 +664,7 @@ def cooc_mutbamscan(
         amplicons = load_all_amplicons(inamp)
     else:
         if vocdir:
-            if not voc:
-                voc = []
+            voc = [] if not voc else list(voc)
             voc += [
                 os.path.join(vocdir, path)
                 for path in [p for p in os.listdir(vocdir) if not p.startswith(".")]
@@ -676,7 +675,7 @@ def cooc_mutbamscan(
         ), "Neither --voc nor --vocdir provided. Please provide variants of concern definition yamls."
         amp_bed = bed_load(bedfile, sort)
         amplicons = make_all_amplicons(
-            amp_bed, voc, revert=revert, n_cooc=cooc, subset_fix=subset_fix
+            amp_bed, list(voc), revert=revert, n_cooc=cooc, subset_fix=subset_fix
         )
         # and save them for future reference
         if outamp:
