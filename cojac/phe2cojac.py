@@ -48,7 +48,7 @@ def phe2cojac(shortname, outname, fname):
         "threshold": int(yam["calling-definition"]["probable"]["mutations-required"]),
     }
 
-    rxshortify = re.compile("^([a-z]{2})[^-]*-([a-z]{2})")
+    rxshortify = re.compile(r"^([a-z]{2})[^-]*-([a-z]{2})")
 
     outy["variant"]["short"] = (
         shortname

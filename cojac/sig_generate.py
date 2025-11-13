@@ -12,7 +12,7 @@ from .cooc_curate import listfilteredmutations, setURL, setLinType, setDebug, qu
 
 # regex
 parsenuc = re.compile(
-    "^(?P<orig>[ATGC])(?P<pos>\d+)(?P<mut>[\-ATCG])$", flags=re.IGNORECASE
+    r"^(?P<orig>[ATGC])(?P<pos>\d+)(?P<mut>[\-ATCG])$", flags=re.IGNORECASE
 )
 
 
