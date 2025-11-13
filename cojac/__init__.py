@@ -5,6 +5,7 @@ from .cooc_mutbamscan import cooc_mutbamscan
 from .cooc_pubmut import cooc_pubmut
 from .cooc_tabmut import cooc_tabmut
 from .phe2cojac import phe2cojac
+from .parser_convert import parser_voc2single
 from ._version import __version__
 
 __all__ = [
@@ -15,4 +16,5 @@ __all__ = [
     "cooc_pubmut",
     "cooc_tabmut",
     "phe2cojac",
+    "parser_voc2single",
 ]

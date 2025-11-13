@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import sys
+import itertools
 import re
 
 rxmutdec = re.compile(
@@ -77,3 +77,47 @@ def filter_decode_vartiant(yam, categories=["mut", "extra", "shared", "subset"])
             )
         ),
     }
+
+
+def to_single(mutstrs, nodels=False):
+    """function to convert to the single mutations format used by standard tools like covSpectrum, etc.
+    YAML:
+       1432: GTC>CAT
+    output:
+       G1432C, T1433A, C1434T
+    """
+
+    for pos, mstr in mutstrs.items():
+        rxm = rxmutdec.match(mstr)
+        ref = mut = None
+
+        if rxm:
+            match = rxm.groupdict()
+
+            if match["ins"]:
+                print(f"insertions not supported (yet): {mutstr} : {match['ins']}")
+                continue
+
+            if match["mut"]:
+                ref = match.get("ref", "")
+                mut = match["mut"]
+            if match["del"]:
+                if nodels:
+                    continue
+                ref = ""
+                mut = match["del"]
+
+            if mut is not None:
+                for r, p, m in zip(
+                    list(
+                        [""] * len(mut)
+                        if ref is None or len(mut) > len(ref)
+                        else list(ref)
+                    ),
+                    itertools.count(int(pos)),
+                    list(mut),
+                ):
+                    yield f"{r}{p}{m}"
+                continue
+
+        raise ValueError(f"cannot parse mutation {mstr}")

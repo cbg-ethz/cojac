@@ -10,6 +10,7 @@ from .cooc_pubmut import cooc_pubmut
 from .cooc_tabmut import cooc_tabmut
 from .phe2cojac import phe2cojac
 from .sig_generate import sig_generate
+from .parser_convert import parser_voc2single
 from .generate_sigs_nextstrains import generate_sigs_nextstrains
 
 
@@ -27,4 +28,5 @@ cli.add_command(cooc_pubmut)
 cli.add_command(cooc_tabmut)
 cli.add_command(phe2cojac)
 cli.add_command(sig_generate)
+cli.add_command(parser_voc2single)
 cli.add_command(generate_sigs_nextstrains)
