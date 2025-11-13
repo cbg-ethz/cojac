@@ -36,8 +36,8 @@ def mut_decode(mutstr):
         if match["ins"]:
             print(f"insertions not supported (yet): {mutstr} : {match['ins']}")
             return None
-    print(f"cannot parse mutation f{mutstr}")
-    sys.exit(1)
+
+    raise ValueError(f"cannot parse mutation f{mutstr}")
 
 
 def filter_decode_vartiant(yam, categories=["mut", "extra", "shared", "subset"]):

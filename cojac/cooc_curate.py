@@ -101,9 +101,7 @@ def getAccessKey():
 def checkerror(reply):
     if reply.get("data", None) is None:
         # TODO prety-printing would help
-        print("Error from server:", json.dumps(reply, indent=2))
-        # TODO replace with proper exception throwing in the future
-        sys.exit(1)
+        raise ConnectionRefusedError("Error from server:", json.dumps(reply, indent=2))
 
     return reply
 

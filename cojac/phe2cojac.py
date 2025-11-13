@@ -119,8 +119,6 @@ def phe2cojac(shortname, outname, fname):
             print(f"{t}:", file=yf)
             print(s, end="", file=yf)
 
-    sys.exit(0)
-
     """
     unique-id: slinky-antennae
     phe-label: VOC-21JAN-02
